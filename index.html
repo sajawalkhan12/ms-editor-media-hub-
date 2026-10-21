@@ -1,122 +1,200 @@
 
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
-<meta charset="UTF-8">
-<meta name="viewport" content="width=device-width, initial-scale=1">
-<title>MS Editor Media Hub</title>
-<style>
-*{box-sizing:border-box}
-body{margin:0;background:#10131c;color:#fff;font-family:Arial,sans-serif}
-header{padding:22px 16px;background:#1d2333}
-h1{margin:0;font-size:24px}
-header p{color:#bbc4d8;margin-bottom:0}
-nav{display:flex;gap:8px;padding:14px;overflow:auto}
-button{border:0;border-radius:9px;padding:11px 15px;background:#39445d;color:white;font-weight:bold}
-button.active{background:#7c5cff}
-main{padding:14px}
-#status{color:#bdc7dc;font-size:14px}
-#items{display:grid;grid-template-columns:repeat(2,minmax(0,1fr));gap:12px}
-.item{background:#202637;border-radius:12px;padding:10px;min-width:0}
-.item img{width:100%;aspect-ratio:16/10;object-fit:cover;border-radius:8px;background:#30384b}
-.item h3{font-size:16px;overflow-wrap:anywhere}
-.item a{color:#b8aaff}
-footer{padding:24px;color:#aeb8ca;text-align:center}
-</style>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MS Editor Media Hub</title>
+  <style>
+    body {
+      margin: 0;
+      background: #10131b;
+      color: white;
+      font-family: Arial, sans-serif;
+    }
+    header {
+      padding: 22px 14px;
+      text-align: center;
+      background: #20263a;
+    }
+    h1 { margin: 0 0 8px; font-size: 25px; }
+    nav {
+      display: flex;
+      flex-wrap: wrap;
+      justify-content: center;
+      gap: 8px;
+      padding: 14px 8px;
+    }
+    button {
+      background: #343e5c;
+      color: white;
+      border: 0;
+      padding: 11px 13px;
+      border-radius: 8px;
+      cursor: pointer;
+    }
+    button.active { background: #087df1; }
+    #status { text-align: center; padding: 12px; }
+    #media {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(145px, 1fr));
+      gap: 14px;
+      padding: 14px;
+    }
+    .item {
+      background: #20263a;
+      border-radius: 10px;
+      padding: 10px;
+      overflow-wrap: anywhere;
+    }
+    .item img {
+      width: 100%;
+      max-height: 190px;
+      object-fit: cover;
+      border-radius: 7px;
+    }
+    .item h3 { font-size: 16px; }
+    .item a { color: #80bdff; }
+    video, audio {
+      width: 100%;
+      margin-top: 8px;
+    }
+  </style>
 </head>
 <body>
-<header>
-<h1>MS Editor Media Hub</h1>
-<p>Movies • Trailers • Images • Audio Songs</p>
-</header>
-<nav>
-<button class="active" data-type="all">All</button>
-<button data-type="movie">Movies</button>
-<button data-type="trailer">Trailers</button>
-<button data-type="image">Images</button>
-<button data-type="audio">Audio</button>
-</nav>
-<main>
-<p id="status">Welcome! Media library loading setup baad mein complete hoga.</p>
-<section id="items"></section>
-</main>
-<footer>MS Editor Media Hub</footer>
-<script>
-const PROJECT_URL = "https://mgjrrgsbddppffnvnmgs.supabase.co";
-const PUBLISHABLE_KEY = "PASTE_YOUR_PUBLISHABLE_KEY_HERE";
-let allItems = [];
-const statusBox = document.getElementById("status");
-const itemsBox = document.getElementById("items");
+  <header>
+    <h1>MS Editor Media Hub</h1>
+    <p>Movies • Trailers • Images • Audio Songs</p>
+  </header>
 
-function showItems(type="all") {
-  itemsBox.replaceChildren();
-  const list = allItems.filter(x => type === "all" || x.media_type === type);
-  if (!list.length) {
-    statusBox.textContent = allItems.length
-      ? "Is category mein abhi media nahi hai."
-      : "Abhi koi media publish nahi hua.";
-    return;
-  }
-  statusBox.textContent = list.length + " item(s)";
-  list.forEach(item => {
-    const card = document.createElement("article");
-    card.className = "item";
-    const title = document.createElement("h3");
-    title.textContent = item.title;
-    card.appendChild(title);
-    const kind = document.createElement("p");
-    kind.textContent = item.media_type;
-    card.appendChild(kind);
-    if (item.poster_path) {
-      const img = document.createElement("img");
-      img.alt = item.title;
-      img.src = item.poster_path;
-      card.prepend(img);
+  <nav>
+    <button class="active" data-type="all">All</button>
+    <button data-type="movie">Movies</button>
+    <button data-type="trailer">Trailers</button>
+    <button data-type="image">Images</button>
+    <button data-type="audio">Audio</button>
+  </nav>
+
+  <div id="status">Loading media...</div>
+  <main id="media"></main>
+
+  <script>
+    const PROJECT_URL =
+      "https://mgjrrgsbddppffnvnmgs.supabase.co";
+
+    const PUBLISHABLE_KEY =
+      "PASTE_YOUR_REAL_PUBLISHABLE_KEY_HERE";
+
+    const mediaBox = document.getElementById("media");
+    const statusBox = document.getElementById("status");
+    let allItems = [];
+    let selectedType = "all";
+
+    async function loadMedia() {
+      try {
+        const response = await fetch(
+          PROJECT_URL +
+          "/rest/v1/media_items?select=*&order=created_at.desc",
+          {
+            headers: {
+              apikey: PUBLISHABLE_KEY,
+              Authorization: "Bearer " + PUBLISHABLE_KEY
+            }
+          }
+        );
+
+        if (!response.ok) {
+          throw new Error("Supabase error: " + response.status);
+        }
+
+        allItems = await response.json();
+        renderMedia();
+      } catch (error) {
+        statusBox.textContent =
+          "Media load nahi hua. Supabase settings aur table check karein.";
+        console.error(error);
+      }
     }
-    const url = item.external_url;
-    if (url) {
-      const link = document.createElement("a");
-      link.href = url;
-      link.target = "_blank";
-      link.rel = "noopener noreferrer";
-      link.textContent = "Open media";
-      card.appendChild(link);
+
+    function renderMedia() {
+      mediaBox.replaceChildren();
+
+      const filtered = allItems.filter(item => {
+        const type = String(item.type || "").toLowerCase();
+        return selectedType === "all" || type === selectedType;
+      });
+
+      statusBox.textContent = filtered.length
+        ? filtered.length + " media item(s)"
+        : "Abhi is category mein media nahi hai.";
+
+      filtered.forEach(item => {
+        const card = document.createElement("article");
+        card.className = "item";
+
+        const title = document.createElement("h3");
+        title.textContent = item.title || "Untitled";
+        card.appendChild(title);
+
+        const url = item.external_url || item.media_url || "";
+        const poster = item.poster_path || item.poster_url || "";
+
+        if (poster && /^https?:\/\//i.test(poster)) {
+          const img = document.createElement("img");
+          img.src = poster;
+          img.alt = item.title || "Media poster";
+          img.loading = "lazy";
+          card.appendChild(img);
+        }
+
+        if (url && /^https?:\/\//i.test(url)) {
+          const type = String(item.type || "").toLowerCase();
+
+          if (type === "audio") {
+            const audio = document.createElement("audio");
+            audio.controls = true;
+            audio.src = url;
+            card.appendChild(audio);
+          } else if (type === "movie" || type === "trailer") {
+            const link = document.createElement("a");
+            link.href = url;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = "Open / Play Video";
+            card.appendChild(link);
+          } else if (type === "image") {
+            const link = document.createElement("a");
+            link.href = url;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = "Open Image";
+            card.appendChild(link);
+          } else {
+            const link = document.createElement("a");
+            link.href = url;
+            link.target = "_blank";
+            link.rel = "noopener noreferrer";
+            link.textContent = "Open Media";
+            card.appendChild(link);
+          }
+        }
+
+        mediaBox.appendChild(card);
+      });
     }
-    itemsBox.appendChild(card);
-  });
-}
 
-document.querySelectorAll("nav button").forEach(btn => {
-  btn.addEventListener("click", () => {
-    document.querySelectorAll("nav button").forEach(b => b.classList.remove("active"));
-    btn.classList.add("active");
-    showItems(btn.dataset.type);
-  });
-});
+    document.querySelectorAll("nav button").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("nav button").forEach(b =>
+          b.classList.remove("active")
+        );
+        button.classList.add("active");
+        selectedType = button.dataset.type;
+        renderMedia();
+      });
+    });
 
-async function loadMedia() {
-  if (PUBLISHABLE_KEY === "PASTE_YOUR_PUBLISHABLE_KEY_HERE") {
-    statusBox.textContent = "Website design ready. Publishable key configure karna baqi hai.";
-    return;
-  }
-  try {
-    const response = await fetch(
-      PROJECT_URL + "/rest/v1/media_items?select=id,title,media_type,poster_path,external_url&order=created_at.desc",
-      { headers: {
-        apikey: PUBLISHABLE_KEY,
-        Authorization: "Bearer " + PUBLISHABLE_KEY
-      }}
-    );
-    if (!response.ok) throw new Error("Request failed: " + response.status);
-    allItems = await response.json();
-    showItems();
-  } catch (e) {
-    statusBox.textContent = "Media load nahi hua. Supabase connection aur permissions check karein.";
-  }
-}
-loadMedia();
-</script>
+    loadMedia();
+  </script>
 </body>
 </html>
-const PUBLISHABLE_KEY = "sb_publishable_آپ_کی_اصل_کی";
