@@ -90,8 +90,9 @@
     let allItems = [];
     let selectedType = "all";
 
-    async function loadMedia() {
-      try {
+    headers: {
+  apikey: PUBLISHABLE_KEY
+    }
         const response = await fetch(
           PROJECT_URL +
           "/rest/v1/media_items?select=*&order=created_at.desc",
