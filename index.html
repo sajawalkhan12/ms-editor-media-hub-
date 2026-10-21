@@ -111,11 +111,9 @@
         allItems = await response.json();
         renderMedia();
       } catch (error) {
-        statusBox.textContent =
-          "Media load nahi hua. Supabase settings aur table check karein.";
-        console.error(error);
+  statusBox.textContent = "Error: " + error.message;
+  console.error(error);
       }
-    }
 
     function renderMedia() {
       mediaBox.replaceChildren();
