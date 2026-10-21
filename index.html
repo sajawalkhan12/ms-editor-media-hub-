@@ -121,7 +121,7 @@
       mediaBox.replaceChildren();
 
       const filtered = allItems.filter(item => {
-        const type = String(item.type || "").toLowerCase();
+        const type = String(item.madia-type || "").toLowerCase();
         return selectedType === "all" || type === selectedType;
       });
 
