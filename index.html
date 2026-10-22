@@ -1,91 +1,45 @@
-
 <!DOCTYPE html>
 <html lang="en">
 <head>
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1">
-  <title>MS Editor Media Hub</title>
   <meta name="theme-color" content="#10101b">
+  <title>MS Editor Media Hub</title>
   <style>
+    :root { color-scheme: dark; }
     * { box-sizing: border-box; }
-    body {
-      margin: 0;
-      background: #10101b;
-      color: #fff;
-      font-family: Arial, sans-serif;
-    }
-    header {
-      padding: 24px 18px;
-      background: linear-gradient(135deg, #292052, #111827);
-      border-bottom: 1px solid #37334d;
-    }
-    header h1 { margin: 0 0 8px; font-size: 25px; }
-    header p { margin: 0; color: #c6c4d6; }
-    nav {
-      display: flex;
-      gap: 8px;
-      padding: 14px;
-      overflow-x: auto;
-      background: #171725;
-    }
-    nav button {
-      padding: 11px 16px;
-      border: 1px solid #44415c;
-      border-radius: 22px;
-      background: #232335;
-      color: white;
-      white-space: nowrap;
-      cursor: pointer;
-    }
-    nav button.active {
-      background: #7546ef;
-      border-color: #7546ef;
-    }
-    main { padding: 18px; }
-    #status {
-      padding: 14px;
-      color: #d4d1e5;
-      background: #1a1a2a;
-      border-radius: 10px;
-      overflow-wrap: anywhere;
-    }
-    .grid {
-      display: grid;
-      grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
-      gap: 15px;
-      margin-top: 18px;
-    }
-    .card {
-      overflow: hidden;
-      border: 1px solid #343348;
-      border-radius: 12px;
-      background: #1b1b2b;
-    }
-    .poster {
-      width: 100%;
-      aspect-ratio: 3 / 4;
-      background: #29283c;
-      object-fit: cover;
-      display: block;
-    }
-    .details { padding: 12px; }
-    .details h3 { margin: 0 0 8px; font-size: 16px; }
-    .details p { color: #bbb9ce; font-size: 13px; }
-    .details video, .details audio {
-      width: 100%;
-      margin-top: 8px;
-    }
-    .details a {
-      display: inline-block;
-      margin-top: 10px;
-      color: #c6afff;
-      overflow-wrap: anywhere;
-    }
-    footer {
-      padding: 25px 15px;
-      color: #aaa8be;
-      text-align: center;
-    }
+    body { margin:0; background:#10101b; color:#f7f5ff; font-family:Arial,sans-serif; }
+    header { padding:22px 16px; background:linear-gradient(135deg,#292052,#111827); border-bottom:1px solid #37334d; }
+    header h1 { margin:0 0 8px; font-size:25px; }
+    header p { margin:0; color:#c6c4d6; }
+    nav { display:flex; flex-wrap:wrap; gap:8px; padding:14px; background:#171725; }
+    button, input, textarea, select { font:inherit; }
+    button { padding:11px 14px; border:1px solid #44415c; border-radius:10px; background:#29283c; color:#fff; cursor:pointer; }
+    button.primary { background:#7546ef; border-color:#7546ef; }
+    button:disabled { opacity:.55; cursor:wait; }
+    nav button { border-radius:22px; }
+    nav button.active { background:#7546ef; border-color:#7546ef; }
+    main { max-width:1100px; margin:auto; padding:16px; }
+    .panel { background:#1a1a2a; border:1px solid #343348; border-radius:14px; padding:16px; margin:0 0 16px; }
+    .panel h2 { margin-top:0; font-size:20px; }
+    .hidden { display:none !important; }
+    .field { margin:12px 0; }
+    label { display:block; margin-bottom:6px; color:#d4d1e5; font-size:14px; }
+    input, textarea, select { display:block; width:100%; padding:12px; border:1px solid #44415c; border-radius:9px; color:#fff; background:#11111d; }
+    textarea { min-height:80px; resize:vertical; }
+    .row { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; }
+    #status, .hint { padding:12px; border-radius:9px; background:#1a1a2a; color:#d4d1e5; overflow-wrap:anywhere; }
+    .grid { display:grid; grid-template-columns:repeat(auto-fill,minmax(155px,1fr)); gap:15px; margin-top:16px; }
+    .card { overflow:hidden; border:1px solid #343348; border-radius:12px; background:#1b1b2b; }
+    .poster { width:100%; aspect-ratio:3/4; object-fit:cover; display:block; background:#29283c; }
+    .details { padding:12px; }
+    .details h3 { margin:0 0 8px; font-size:16px; overflow-wrap:anywhere; }
+    .details p { color:#bbb9ce; font-size:13px; overflow-wrap:anywhere; }
+    video, audio { width:100%; margin-top:8px; }
+    a { color:#c6afff; overflow-wrap:anywhere; }
+    .admin-actions { display:flex; gap:8px; flex-wrap:wrap; margin-top:10px; }
+    footer { padding:25px 15px; color:#aaa8be; text-align:center; }
+    .small { font-size:12px; color:#aaa8be; }
   </style>
 </head>
 <body>
@@ -99,223 +53,340 @@
     <button data-type="movie">Movies</button>
     <button data-type="trailer">Trailers</button>
     <button data-type="audio">Audio Songs</button>
+    <button id="adminToggle">Admin Login</button>
   </nav>
 
   <main>
     <div id="status" role="status">Connecting to media library...</div>
-    <section id="mediaGrid" class="grid"></section>
+
+    <section id="authPanel" class="panel hidden">
+      <h2>Admin Login</h2>
+      <p class="hint">Use the email and password for your existing Supabase Authentication user. Only a user listed in the admin_users table can upload media.</p>
+      <form id="loginForm">
+        <div class="field">
+          <label for="email">Email</label>
+          <input id="email" type="email" autocomplete="username" required>
+        </div>
+        <div class="field">
+          <label for="password">Password</label>
+          <input id="password" type="password" autocomplete="current-password" required>
+        </div>
+        <button class="primary" type="submit">Log in</button>
+        <button id="cancelLogin" type="button">Cancel</button>
+      </form>
+    </section>
+
+    <section id="adminPanel" class="panel hidden">
+      <h2>Admin Upload</h2>
+      <p id="adminMessage" class="hint">Checking admin permission...</p>
+      <form id="uploadForm">
+        <div class="row">
+          <div class="field">
+            <label for="mediaType">Media type</label>
+            <select id="mediaType" required>
+              <option value="movie">Movie</option>
+              <option value="trailer">Trailer</option>
+              <option value="audio">Audio Song</option>
+            </select>
+          </div>
+          <div class="field">
+            <label for="title">Title</label>
+            <input id="title" maxlength="200" required placeholder="Movie or song name">
+          </div>
+        </div>
+        <div class="field">
+          <label for="description">Description (optional)</label>
+          <textarea id="description" maxlength="2000" placeholder="Write a short description"></textarea>
+        </div>
+        <div class="field">
+          <label for="mediaFile">Media file (optional if using an external URL)</label>
+          <input id="mediaFile" type="file" accept="video/*,audio/*">
+        </div>
+        <div class="field">
+          <label for="externalUrl">External media URL (optional)</label>
+          <input id="externalUrl" type="url" placeholder="https://...">
+        </div>
+        <div class="field">
+          <label for="posterFile">Poster image (optional)</label>
+          <input id="posterFile" type="file" accept="image/*">
+        </div>
+        <p class="small">Choose a media file OR provide an external URL. Large video uploads may exceed free storage limits. Do not upload copyrighted material unless you have permission.</p>
+        <button class="primary" id="uploadButton" type="submit">Upload Media</button>
+        <button id="logoutButton" type="button">Log out</button>
+      </form>
+    </section>
+
+    <section id="mediaGrid" class="grid" aria-live="polite"></section>
   </main>
 
   <footer>MS Editor Media Hub</footer>
 
+  <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
   <script>
-    // Paste your real Supabase project URL and Publishable Key here.
-    const PROJECT_URL =
-      "https://mgjrrgsbddppffnvnmgs.supabase.co";
-
-    const PUBLISHABLE_KEY =
-    "sb_publishable_itipFHFloN9JGgcW4wffvA_LjDoGoGr"
-
+    // Paste your Supabase Publishable Key ONLY in the value below.
+    // Never put a Supabase secret/service_role key in a public website.
+    const PROJECT_URL = "https://mgjrrgsbddppffnvnmgs.supabase.co";
+    const PUBLISHABLE_KEY = "PASTE_YOUR_REAL_PUBLISHABLE_KEY_HERE";
     const TABLE_NAME = "media_items";
     const BUCKET_NAME = "media";
 
     const statusBox = document.getElementById("status");
     const mediaGrid = document.getElementById("mediaGrid");
-
+    const authPanel = document.getElementById("authPanel");
+    const adminPanel = document.getElementById("adminPanel");
+    const adminMessage = document.getElementById("adminMessage");
+    const loginForm = document.getElementById("loginForm");
+    const uploadForm = document.getElementById("uploadForm");
+    const uploadButton = document.getElementById("uploadButton");
+    let supabaseClient = null;
     let allItems = [];
     let selectedType = "all";
+    let currentUser = null;
+    let isAdmin = false;
 
-    function getValue(item, names) {
-      for (const name of names) {
-        const value = item[name];
-        if (value !== null && value !== undefined && value !== "") {
-          return value;
-        }
-      }
-      return "";
+    function showStatus(message) { statusBox.textContent = message; }
+    function safeName(name) {
+      return String(name || "file").normalize("NFKD")
+        .replace(/[^a-zA-Z0-9._-]+/g, "_").slice(-100) || "file";
     }
-
-    function getMediaType(item) {
-      const raw = String(getValue(item, [
-        "media_type", "category", "type", "content_type"
-      ])).toLowerCase();
-
-      if (raw.includes("audio") || raw.includes("song") ||
-          raw.includes("music")) return "audio";
-
-      if (raw.includes("trailer")) return "trailer";
-
-      if (raw.includes("movie") || raw.includes("film") ||
-          raw.includes("video")) return "movie";
-
+    function publicUrl(path) {
+      if (!path) return "";
+      if (/^https?:\/\//i.test(path)) return path;
+      const clean = String(path).replace(/^\/+/, "").replace(/^media\//, "");
+      return PROJECT_URL + "/storage/v1/object/public/" + BUCKET_NAME + "/" +
+        clean.split("/").map(encodeURIComponent).join("/");
+    }
+    function mediaType(item) {
+      const type = String(item.media_type || "").toLowerCase();
+      if (type.includes("audio") || type.includes("song")) return "audio";
+      if (type.includes("trailer")) return "trailer";
+      if (type.includes("movie") || type.includes("film") || type.includes("video")) return "movie";
       return "other";
     }
-
-    function getPublicUrl(value) {
-      if (!value) return "";
-
-      const path = String(value).trim();
-
-      if (/^https?:\/\//i.test(path)) return path;
-
-      const cleanPath = path
-        .replace(/^\/+/, "")
-        .replace(/^media\//, "");
-
-      return PROJECT_URL + "/storage/v1/object/public/" +
-        BUCKET_NAME + "/" +
-        cleanPath.split("/").map(encodeURIComponent).join("/");
-    }
-
     function addText(parent, tag, text, className) {
-      const element = document.createElement(tag);
-      element.textContent = text;
-      if (className) element.className = className;
-      parent.appendChild(element);
-      return element;
+      const el = document.createElement(tag);
+      el.textContent = text || "";
+      if (className) el.className = className;
+      parent.appendChild(el);
+      return el;
     }
-
+    function setAdminUi() {
+      document.getElementById("adminToggle").textContent = currentUser ? "Admin Panel" : "Admin Login";
+      authPanel.classList.toggle("hidden", !!currentUser);
+      adminPanel.classList.toggle("hidden", !currentUser || !isAdmin);
+      if (currentUser && !isAdmin) {
+        authPanel.classList.add("hidden");
+        adminPanel.classList.remove("hidden");
+        adminMessage.textContent = "This account is logged in, but is not listed as an authorized media admin.";
+        uploadForm.classList.add("hidden");
+      } else {
+        uploadForm.classList.remove("hidden");
+      }
+    }
+    async function checkAdmin() {
+      if (!currentUser) { isAdmin = false; setAdminUi(); return; }
+      try {
+        const { data, error } = await supabaseClient.rpc("is_media_admin");
+        if (error) throw error;
+        isAdmin = data === true;
+        setAdminUi();
+        adminMessage.textContent = isAdmin
+          ? "Admin verified. You can upload media below."
+          : "Login worked, but this user is not authorized in admin_users.";
+      } catch (error) {
+        isAdmin = false;
+        setAdminUi();
+        adminMessage.textContent = "Could not verify admin permission: " + error.message;
+      }
+    }
+    async function loadSession() {
+      const { data, error } = await supabaseClient.auth.getSession();
+      if (error) showStatus("Could not check login session: " + error.message);
+      currentUser = data && data.session ? data.session.user : null;
+      await checkAdmin();
+    }
+    async function loadMedia() {
+      showStatus("Connecting to media library...");
+      mediaGrid.replaceChildren();
+      try {
+        const { data, error } = await supabaseClient
+          .from(TABLE_NAME).select("*").order("created_at", { ascending: false });
+        if (error) throw error;
+        allItems = data || [];
+        renderMedia();
+      } catch (error) {
+        console.error(error);
+        showStatus("Could not load media: " + error.message);
+      }
+    }
     function renderMedia() {
       mediaGrid.replaceChildren();
-
-      const items = allItems.filter(item =>
-        selectedType === "all" ||
-        getMediaType(item) === selectedType
-      );
-
-      if (items.length === 0) {
-        statusBox.textContent = allItems.length === 0
-          ? "No media uploaded yet. Please check back later."
-          : "No media found in this category.";
+      const items = allItems.filter(item => selectedType === "all" || mediaType(item) === selectedType);
+      if (!items.length) {
+        showStatus(allItems.length ? "No media found in this category." : "No media uploaded yet. Please check back later.");
         return;
       }
-
-      statusBox.textContent = items.length + " item(s) found.";
-
-      items.forEach(item => {
-        const title = String(getValue(item, [
-          "title", "name", "media_name", "movie_name", "song_name"
-        ]) || "Untitled Media");
-
-        const description = String(getValue(item, [
-          "description", "details"
-        ]) || "");
-
-        const posterValue = getValue(item, [
-          "poster_url", "thumbnail_url", "image_url", "poster"
-        ]);
-
-        const fileValue = getValue(item, [
-          "media_url", "file_url", "public_url",
-          "video_url", "audio_url", "url",
-          "storage_path", "file_path", "file_name"
-        ]);
-
-        const mediaUrl = getPublicUrl(fileValue);
-        const type = getMediaType(item);
-
+      showStatus(items.length + " item(s) found.");
+      for (const item of items) {
         const card = document.createElement("article");
         card.className = "card";
-
-        if (posterValue) {
+        const posterPath = item.poster_path || "";
+        const mediaPath = item.storage_path || item.external_url || "";
+        const mediaUrl = publicUrl(mediaPath);
+        if (posterPath) {
           const poster = document.createElement("img");
           poster.className = "poster";
-          poster.src = getPublicUrl(posterValue);
-          poster.alt = title + " poster";
+          poster.src = publicUrl(posterPath);
+          poster.alt = (item.title || "Media") + " poster";
           poster.loading = "lazy";
           poster.onerror = () => poster.remove();
           card.appendChild(poster);
         }
-
         const details = document.createElement("div");
         details.className = "details";
-        addText(details, "h3", title);
-        addText(details, "p", type.toUpperCase());
-
-        if (description) addText(details, "p", description);
-
-        if (mediaUrl && type === "audio") {
+        addText(details, "h3", item.title || "Untitled Media");
+        addText(details, "p", String(item.media_type || "media").toUpperCase());
+        if (item.description) addText(details, "p", item.description);
+        if (mediaUrl && mediaType(item) === "audio") {
           const player = document.createElement("audio");
-          player.controls = true;
-          player.preload = "none";
-          player.src = mediaUrl;
+          player.controls = true; player.preload = "none"; player.src = mediaUrl;
           details.appendChild(player);
-        } else if (mediaUrl && type !== "other") {
+        } else if (mediaUrl && mediaType(item) !== "other") {
           const player = document.createElement("video");
-          player.controls = true;
-          player.preload = "none";
-          player.playsInline = true;
-          player.poster = posterValue ? getPublicUrl(posterValue) : "";
+          player.controls = true; player.preload = "none"; player.playsInline = true;
+          if (posterPath) player.poster = publicUrl(posterPath);
           player.src = mediaUrl;
           details.appendChild(player);
         }
-
         if (mediaUrl) {
-          const link = document.createElement("a");
-          link.href = mediaUrl;
-          link.textContent = "Open / Download";
-          link.target = "_blank";
-          link.rel = "noopener noreferrer";
-          details.appendChild(link);
+          const link = addText(details, "a", "Open / Download");
+          link.href = mediaUrl; link.target = "_blank"; link.rel = "noopener noreferrer";
+          link.setAttribute("download", "");
         }
-
+        if (isAdmin) {
+          const actions = document.createElement("div");
+          actions.className = "admin-actions";
+          const del = addText(actions, "button", "Delete");
+          del.type = "button";
+          del.addEventListener("click", () => deleteItem(item));
+          details.appendChild(actions);
+        }
         card.appendChild(details);
         mediaGrid.appendChild(card);
+      }
+    }
+    async function uploadFile(file, prefix) {
+      if (!file) return "";
+      const path = currentUser.id + "/" + prefix + "_" + Date.now() + "_" + safeName(file.name);
+      const { error } = await supabaseClient.storage.from(BUCKET_NAME).upload(path, file, {
+        cacheControl: "3600", upsert: false, contentType: file.type || undefined
       });
+      if (error) throw error;
+      return path;
     }
-
-    async function loadMedia() {
-      statusBox.textContent = "Connecting to media library...";
-      mediaGrid.replaceChildren();
-
-      if (PUBLISHABLE_KEY ===
-          "PASTE_YOUR_REAL_PUBLISHABLE_KEY_HERE") {
-        statusBox.textContent =
-          "Setup needed: add your Supabase Publishable Key in index.html.";
-        return;
-      }
-
+    loginForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      const email = document.getElementById("email").value.trim();
+      const password = document.getElementById("password").value;
+      const submit = loginForm.querySelector('button[type="submit"]');
+      submit.disabled = true;
       try {
-        const response = await fetch(
-          PROJECT_URL + "/rest/v1/" + TABLE_NAME +
-          "?select=*&order=created_at.desc",
-          {
-            headers: {
-              "apikey": PUBLISHABLE_KEY,
-              "Authorization": "Bearer " + PUBLISHABLE_KEY
-            }
-          }
-        );
-
-        if (!response.ok) {
-          const details = await response.text();
-          throw new Error("HTTP " + response.status + ": " + details);
-        }
-
-        allItems = await response.json();
-        renderMedia();
+        const { data, error } = await supabaseClient.auth.signInWithPassword({ email, password });
+        if (error) throw error;
+        currentUser = data.user;
+        await checkAdmin();
+        showStatus(isAdmin ? "Admin login successful." : "Login successful, but admin permission was not found.");
       } catch (error) {
-        console.error("Media loading failed:", error);
-        statusBox.textContent =
-          "Could not load media. Check the internet, Supabase API key, " +
-          "table permissions and database policies. Details: " +
-          error.message;
+        adminMessage.textContent = "Login failed: " + error.message;
+      } finally { submit.disabled = false; }
+    });
+    document.getElementById("cancelLogin").addEventListener("click", () => authPanel.classList.add("hidden"));
+    document.getElementById("adminToggle").addEventListener("click", async () => {
+      if (!currentUser) authPanel.classList.toggle("hidden");
+      else adminPanel.classList.toggle("hidden");
+    });
+    document.getElementById("logoutButton").addEventListener("click", async () => {
+      const { error } = await supabaseClient.auth.signOut();
+      currentUser = null; isAdmin = false; setAdminUi(); authPanel.classList.add("hidden");
+      showStatus(error ? "Logout issue: " + error.message : "Logged out.");
+      renderMedia();
+    });
+    uploadForm.addEventListener("submit", async (event) => {
+      event.preventDefault();
+      if (!currentUser || !isAdmin) { adminMessage.textContent = "Admin permission required."; return; }
+      const file = document.getElementById("mediaFile").files[0];
+      const poster = document.getElementById("posterFile").files[0];
+      const externalUrl = document.getElementById("externalUrl").value.trim();
+      if (!file && !externalUrl) { adminMessage.textContent = "Choose a media file or enter an external URL."; return; }
+      if (file && externalUrl) { adminMessage.textContent = "Use either a media file or an external URL, not both."; return; }
+      uploadButton.disabled = true;
+      uploadButton.textContent = "Uploading...";
+      let storagePath = "";
+      let posterPath = "";
+      try {
+        if (file) storagePath = await uploadFile(file, "media");
+        if (poster) posterPath = await uploadFile(poster, "poster");
+        const record = {
+          title: document.getElementById("title").value.trim(),
+          description: document.getElementById("description").value.trim() || null,
+          media_type: document.getElementById("mediaType").value,
+          storage_path: storagePath || null,
+          external_url: externalUrl || null,
+          poster_path: posterPath || null,
+          created_by: currentUser.id
+        };
+        const { error } = await supabaseClient.from(TABLE_NAME).insert(record);
+        if (error) throw error;
+        uploadForm.reset();
+        adminMessage.textContent = "Upload successful.";
+        await loadMedia();
+      } catch (error) {
+        console.error(error);
+        adminMessage.textContent = "Upload failed: " + error.message;
+        if (storagePath || posterPath) {
+          adminMessage.textContent += " A file may already be in Storage; if so, it can be removed from Storage manually.";
+        }
+      } finally {
+        uploadButton.disabled = false;
+        uploadButton.textContent = "Upload Media";
+      }
+    });
+    async function deleteItem(item) {
+      if (!isAdmin || !confirm('Delete "' + (item.title || "this item") + '"?')) return;
+      try {
+        const paths = [item.storage_path, item.poster_path].filter(p => p && !/^https?:\/\//i.test(p));
+        if (paths.length) {
+          const { error: storageError } = await supabaseClient.storage.from(BUCKET_NAME).remove(paths);
+          if (storageError) throw storageError;
+        }
+        const { error } = await supabaseClient.from(TABLE_NAME).delete().eq("id", item.id);
+        if (error) throw error;
+        await loadMedia();
+      } catch (error) {
+        alert("Delete failed: " + error.message);
       }
     }
-
-    document.querySelectorAll("nav button").forEach(button => {
+    document.querySelectorAll("nav button[data-type]").forEach(button => {
       button.addEventListener("click", () => {
-        document.querySelectorAll("nav button").forEach(other => {
-          other.classList.remove("active");
-        });
-
+        document.querySelectorAll("nav button[data-type]").forEach(b => b.classList.remove("active"));
         button.classList.add("active");
         selectedType = button.dataset.type;
         renderMedia();
       });
     });
 
-    loadMedia();
+    if (PUBLISHABLE_KEY === "PASTE_YOUR_REAL_PUBLISHABLE_KEY_HERE") {
+      showStatus("Setup needed: add your Supabase Publishable Key in index.html.");
+    } else if (!window.supabase || !window.supabase.createClient) {
+      showStatus("Supabase client failed to load. Check your internet connection and reload.");
+    } else {
+      supabaseClient = window.supabase.createClient(PROJECT_URL, PUBLISHABLE_KEY);
+      supabaseClient.auth.onAuthStateChange((_event, session) => {
+        currentUser = session ? session.user : null;
+        setTimeout(() => checkAdmin(), 0);
+      });
+      loadSession().then(loadMedia);
+    }
   </script>
 </body>
 </html>
