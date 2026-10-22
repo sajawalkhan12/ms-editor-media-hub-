@@ -94,9 +94,7 @@
   apikey: PUBLISHABLE_KEY
     }
         const response = await fetch(
-          PROJECT_URL +
-          "/rest/v1/media_items?select=*&order=created_at.desc",
-          {
+          const PROJECT_URL = "https://mgjrrgsbddppffnvnmgs.supabase.co";
             headers: {
               apikey: PUBLISHABLE_KEY,
               Authorization: "Bearer " + PUBLISHABLE_KEY
