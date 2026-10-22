@@ -1,0 +1,321 @@
+
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1">
+  <title>MS Editor Media Hub</title>
+  <meta name="theme-color" content="#10101b">
+  <style>
+    * { box-sizing: border-box; }
+    body {
+      margin: 0;
+      background: #10101b;
+      color: #fff;
+      font-family: Arial, sans-serif;
+    }
+    header {
+      padding: 24px 18px;
+      background: linear-gradient(135deg, #292052, #111827);
+      border-bottom: 1px solid #37334d;
+    }
+    header h1 { margin: 0 0 8px; font-size: 25px; }
+    header p { margin: 0; color: #c6c4d6; }
+    nav {
+      display: flex;
+      gap: 8px;
+      padding: 14px;
+      overflow-x: auto;
+      background: #171725;
+    }
+    nav button {
+      padding: 11px 16px;
+      border: 1px solid #44415c;
+      border-radius: 22px;
+      background: #232335;
+      color: white;
+      white-space: nowrap;
+      cursor: pointer;
+    }
+    nav button.active {
+      background: #7546ef;
+      border-color: #7546ef;
+    }
+    main { padding: 18px; }
+    #status {
+      padding: 14px;
+      color: #d4d1e5;
+      background: #1a1a2a;
+      border-radius: 10px;
+      overflow-wrap: anywhere;
+    }
+    .grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(145px, 1fr));
+      gap: 15px;
+      margin-top: 18px;
+    }
+    .card {
+      overflow: hidden;
+      border: 1px solid #343348;
+      border-radius: 12px;
+      background: #1b1b2b;
+    }
+    .poster {
+      width: 100%;
+      aspect-ratio: 3 / 4;
+      background: #29283c;
+      object-fit: cover;
+      display: block;
+    }
+    .details { padding: 12px; }
+    .details h3 { margin: 0 0 8px; font-size: 16px; }
+    .details p { color: #bbb9ce; font-size: 13px; }
+    .details video, .details audio {
+      width: 100%;
+      margin-top: 8px;
+    }
+    .details a {
+      display: inline-block;
+      margin-top: 10px;
+      color: #c6afff;
+      overflow-wrap: anywhere;
+    }
+    footer {
+      padding: 25px 15px;
+      color: #aaa8be;
+      text-align: center;
+    }
+  </style>
+</head>
+<body>
+  <header>
+    <h1>MS Editor Media Hub</h1>
+    <p>Your home for movies, trailers and audio songs.</p>
+  </header>
+
+  <nav aria-label="Media categories">
+    <button class="active" data-type="all">All</button>
+    <button data-type="movie">Movies</button>
+    <button data-type="trailer">Trailers</button>
+    <button data-type="audio">Audio Songs</button>
+  </nav>
+
+  <main>
+    <div id="status" role="status">Connecting to media library...</div>
+    <section id="mediaGrid" class="grid"></section>
+  </main>
+
+  <footer>MS Editor Media Hub</footer>
+
+  <script>
+    // Paste your real Supabase project URL and Publishable Key here.
+    const PROJECT_URL =
+      "https://mgjrrgsbddppffnvnmgs.supabase.co";
+
+    const PUBLISHABLE_KEY =
+      "PASTE_YOUR_REAL_PUBLISHABLE_KEY_HERE";
+
+    const TABLE_NAME = "media_items";
+    const BUCKET_NAME = "media";
+
+    const statusBox = document.getElementById("status");
+    const mediaGrid = document.getElementById("mediaGrid");
+
+    let allItems = [];
+    let selectedType = "all";
+
+    function getValue(item, names) {
+      for (const name of names) {
+        const value = item[name];
+        if (value !== null && value !== undefined && value !== "") {
+          return value;
+        }
+      }
+      return "";
+    }
+
+    function getMediaType(item) {
+      const raw = String(getValue(item, [
+        "media_type", "category", "type", "content_type"
+      ])).toLowerCase();
+
+      if (raw.includes("audio") || raw.includes("song") ||
+          raw.includes("music")) return "audio";
+
+      if (raw.includes("trailer")) return "trailer";
+
+      if (raw.includes("movie") || raw.includes("film") ||
+          raw.includes("video")) return "movie";
+
+      return "other";
+    }
+
+    function getPublicUrl(value) {
+      if (!value) return "";
+
+      const path = String(value).trim();
+
+      if (/^https?:\/\//i.test(path)) return path;
+
+      const cleanPath = path
+        .replace(/^\/+/, "")
+        .replace(/^media\//, "");
+
+      return PROJECT_URL + "/storage/v1/object/public/" +
+        BUCKET_NAME + "/" +
+        cleanPath.split("/").map(encodeURIComponent).join("/");
+    }
+
+    function addText(parent, tag, text, className) {
+      const element = document.createElement(tag);
+      element.textContent = text;
+      if (className) element.className = className;
+      parent.appendChild(element);
+      return element;
+    }
+
+    function renderMedia() {
+      mediaGrid.replaceChildren();
+
+      const items = allItems.filter(item =>
+        selectedType === "all" ||
+        getMediaType(item) === selectedType
+      );
+
+      if (items.length === 0) {
+        statusBox.textContent = allItems.length === 0
+          ? "No media uploaded yet. Please check back later."
+          : "No media found in this category.";
+        return;
+      }
+
+      statusBox.textContent = items.length + " item(s) found.";
+
+      items.forEach(item => {
+        const title = String(getValue(item, [
+          "title", "name", "media_name", "movie_name", "song_name"
+        ]) || "Untitled Media");
+
+        const description = String(getValue(item, [
+          "description", "details"
+        ]) || "");
+
+        const posterValue = getValue(item, [
+          "poster_url", "thumbnail_url", "image_url", "poster"
+        ]);
+
+        const fileValue = getValue(item, [
+          "media_url", "file_url", "public_url",
+          "video_url", "audio_url", "url",
+          "storage_path", "file_path", "file_name"
+        ]);
+
+        const mediaUrl = getPublicUrl(fileValue);
+        const type = getMediaType(item);
+
+        const card = document.createElement("article");
+        card.className = "card";
+
+        if (posterValue) {
+          const poster = document.createElement("img");
+          poster.className = "poster";
+          poster.src = getPublicUrl(posterValue);
+          poster.alt = title + " poster";
+          poster.loading = "lazy";
+          poster.onerror = () => poster.remove();
+          card.appendChild(poster);
+        }
+
+        const details = document.createElement("div");
+        details.className = "details";
+        addText(details, "h3", title);
+        addText(details, "p", type.toUpperCase());
+
+        if (description) addText(details, "p", description);
+
+        if (mediaUrl && type === "audio") {
+          const player = document.createElement("audio");
+          player.controls = true;
+          player.preload = "none";
+          player.src = mediaUrl;
+          details.appendChild(player);
+        } else if (mediaUrl && type !== "other") {
+          const player = document.createElement("video");
+          player.controls = true;
+          player.preload = "none";
+          player.playsInline = true;
+          player.poster = posterValue ? getPublicUrl(posterValue) : "";
+          player.src = mediaUrl;
+          details.appendChild(player);
+        }
+
+        if (mediaUrl) {
+          const link = document.createElement("a");
+          link.href = mediaUrl;
+          link.textContent = "Open / Download";
+          link.target = "_blank";
+          link.rel = "noopener noreferrer";
+          details.appendChild(link);
+        }
+
+        card.appendChild(details);
+        mediaGrid.appendChild(card);
+      });
+    }
+
+    async function loadMedia() {
+      statusBox.textContent = "Connecting to media library...";
+      mediaGrid.replaceChildren();
+
+      if (PUBLISHABLE_KEY ===
+          "PASTE_YOUR_REAL_PUBLISHABLE_KEY_HERE") {
+        statusBox.textContent =
+          "Setup needed: add your Supabase Publishable Key in index.html.";
+        return;
+      }
+
+      try {
+        const response = await fetch(
+          PROJECT_URL + "/rest/v1/" + TABLE_NAME +
+          "?select=*&order=created_at.desc",
+          {
+            headers: {
+              "apikey": PUBLISHABLE_KEY,
+              "Authorization": "Bearer " + PUBLISHABLE_KEY
+            }
+          }
+        );
+
+        if (!response.ok) {
+          const details = await response.text();
+          throw new Error("HTTP " + response.status + ": " + details);
+        }
+
+        allItems = await response.json();
+        renderMedia();
+      } catch (error) {
+        console.error("Media loading failed:", error);
+        statusBox.textContent =
+          "Could not load media. Check the internet, Supabase API key, " +
+          "table permissions and database policies. Details: " +
+          error.message;
+      }
+    }
+
+    document.querySelectorAll("nav button").forEach(button => {
+      button.addEventListener("click", () => {
+        document.querySelectorAll("nav button").forEach(other => {
+          other.classList.remove("active");
+        });
+
+        button.classList.add("active");
+        selectedType = button.dataset.type;
+        renderMedia();
+      });
+    });
+
+    loadMedia();
+  </script>
+</body>
+</html>
