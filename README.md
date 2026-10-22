@@ -1,1 +1,1 @@
-#MS_Editor
+ms-editor-media-hub-
