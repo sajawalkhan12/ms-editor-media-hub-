@@ -85,8 +85,19 @@
 const PUBLISHABLE_KEY =
   "sb_publishable_آپ_کی_اصل_لمبی_key";
     
-    async function loadMedia() {
-  statusBox.textContent = "Loading media...";
+    document.querySelectorAll("nav button").forEach(button => {
+  button.addEventListener("click", () => {
+    document.querySelectorAll("nav button").forEach(b => {
+      b.classList.remove("active");
+    });
+
+    button.classList.add("active");
+    selectedType = button.dataset.type;
+    renderMedia();
+  });
+});
+
+loadMedia();
 
   try {
     const response = await fetch(
