@@ -90,7 +90,7 @@ async function toggleSharedLike(id){
 async function addSharedComment(id,name,txt){
  if(!cfg())return;
  let lastError=null;
- 
+ name:r.visitor_name??r.display_name??r.user_name??r.name??r.author_name??'Visitor'
 comments:{table:'media_comments',id:['media_id','media_item_id','post_id','item_id'],body:['comment_text','content','comment','text','body'],name:['visitor_name','display_name','user_name','name','author_name'],who:['visitor_id','user_id','client_id','browser_id']},
 
      const row={[idCol]:id,[bodyCol]:txt,[nameCol]:name,[whoCol]:visitorId};
