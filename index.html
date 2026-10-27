@@ -90,10 +90,9 @@ async function toggleSharedLike(id){
 async function addSharedComment(id,name,txt){
  if(!cfg())return;
  let lastError=null;
- for(const idCol of tableColumns.comments.id){
-  for(const bodyCol of tableColumns.comments.body){
-   for(const nameCol of tableColumns.comments.name){
-    for(const whoCol of tableColumns.comments.who){
+ 
+comments:{table:'media_comments',id:['media_id','media_item_id','post_id','item_id'],body:['comment_text','content','comment','text','body'],name:['visitor_name','display_name','user_name','name','author_name'],who:['visitor_id','user_id','client_id','browser_id']},
+
      const row={[idCol]:id,[bodyCol]:txt,[nameCol]:name,[whoCol]:visitorId};
      const {error}=await sb.from('media_comments').insert(row);if(!error){await loadSharedStats();return}lastError=error;
     }
