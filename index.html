@@ -304,6 +304,8 @@ $('qaSearch').addEventListener('click',()=>{$('searchBox').focus();$('searchBox'
 $('qaFilter').addEventListener('click',()=>{$('menuToggle').click()});
 $('qaCompare').addEventListener('click',()=>{setCategory('video_prompt');setNavActive('video_prompt');showNotice('Open a prompt card to review and copy its full prompt.')});
 $('qaBuild').addEventListener('click',()=>openAdminPage(adminAuthorized?'upload':'login'));
+// Start on the new Reels home; the original feed remains available under Posts.
+showMainPage('reels');
 </script>
 <style id="scroll-fix-v3">
 /* Scroll fix: banner, feed, cover/logo settings, and upload form all scroll with the page. */
