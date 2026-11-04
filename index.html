@@ -444,5 +444,36 @@ main.wrap>#reelsPage .reel-player{height:min(54dvh,620px)!important}
  #reelsPage .reel-side-actions{right:8px;bottom:72px}
 }
 </style>
+
+<script id="reels-autoplay-v1">
+/* Play only the Reel currently on screen; pause off-screen videos to save data and battery. */
+(function(){
+  const feed=document.getElementById('reelsFeed');
+  if(!feed || !('IntersectionObserver' in window)) return;
+  const visible=new IntersectionObserver(entries=>{
+    entries.forEach(entry=>{
+      const video=entry.target.querySelector('video.reel-video');
+      if(!video) return;
+      if(entry.isIntersecting && entry.intersectionRatio>=0.72){
+        video.muted=true;
+        video.playsInline=true;
+        const attempt=video.play();
+        if(attempt && typeof attempt.catch==='function') attempt.catch(()=>{});
+      }else{
+        video.pause();
+      }
+    });
+  },{root:feed,threshold:[0,0.25,0.5,0.72,1]});
+  function watchCards(){
+    feed.querySelectorAll('[data-reel-card]').forEach(card=>{
+      if(card.dataset.autoplayObserved==='1') return;
+      card.dataset.autoplayObserved='1';
+      visible.observe(card);
+    });
+  }
+  watchCards();
+  new MutationObserver(watchCards).observe(feed,{childList:true});
+})();
+</script>
 </body></html>
 
