@@ -445,6 +445,56 @@ main.wrap>#reelsPage .reel-player{height:min(54dvh,620px)!important}
 }
 </style>
 
+<style id="reels-fullscreen-title-fix">
+/* Full-screen mobile Reels: video fills the screen, title sits directly over the lower-left video. */
+@media(max-width:700px){
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage{
+    position:fixed!important;inset:0 0 66px 0!important;z-index:90!important;
+    width:100vw!important;height:auto!important;max-height:none!important;
+    min-height:0!important;margin:0!important;padding:0!important;
+    background:#000!important;display:flex!important;flex-direction:column!important;
+  }
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reels-heading{display:none!important}
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage #reelsFeed{
+    flex:1 1 auto!important;width:100%!important;height:100%!important;min-height:0!important;
+    overflow-y:auto!important;background:#000!important;
+  }
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-card{
+    width:100%!important;height:100%!important;min-height:100%!important;
+    padding:0!important;margin:0!important;border:0!important;background:#000!important;
+  }
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-player{
+    position:relative!important;flex:1 1 auto!important;width:100%!important;
+    height:100%!important;min-height:100%!important;max-height:none!important;
+    border-radius:0!important;background:#000!important;
+  }
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-player video,
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-player iframe{
+    width:100%!important;height:100%!important;max-height:none!important;
+    object-fit:cover!important;background:#000!important;
+  }
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-overlay-info{
+    position:absolute!important;left:14px!important;right:72px!important;bottom:20px!important;
+    z-index:6!important;padding:0!important;margin:0!important;
+    background:transparent!important;border:0!important;border-radius:0!important;
+    box-shadow:none!important;color:#fff!important;text-shadow:0 2px 5px #000,0 1px 2px #000!important;
+    pointer-events:none!important;
+  }
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-overlay-info b{
+    display:block!important;font-size:16px!important;font-weight:800!important;color:#fff!important;
+    background:transparent!important;padding:0!important;
+  }
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-overlay-info span{
+    display:block!important;font-size:13px!important;color:#fff!important;background:transparent!important;
+  }
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-info{display:none!important}
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-side-actions{
+    right:10px!important;bottom:78px!important;z-index:8!important;
+  }
+  body:has(#reelsPage:not(.hidden)) #bottomNav{z-index:110!important}
+}
+</style>
+
 <script id="reels-autoplay-v1">
 /* Play only the Reel currently on screen; pause off-screen videos to save data and battery. */
 (function(){
