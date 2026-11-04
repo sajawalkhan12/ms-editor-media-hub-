@@ -681,5 +681,17 @@ main.wrap>#reelsPage .reel-player{height:min(54dvh,620px)!important}
 #reelsPage .reel-emoji-picker.hidden{display:none!important}\n#reelsPage .reel-emoji-picker button{background:transparent;border:0;padding:3px;font-size:25px;line-height:1.3;box-shadow:none}
 #reelsPage .reel-emoji-hint{display:block;color:#a7c3c6;font-size:10px;margin:0 2px 5px}
 #reelsPage textarea[data-emoji-longpress]{touch-action:pan-y;-webkit-user-select:text;user-select:text}\n#reelsPage .reel-emoji-picker button{cursor:pointer;touch-action:manipulation}#reelsPage .reel-emoji-toggle{display:inline-block!important;visibility:visible!important;margin:6px 0;padding:7px 12px;border:1px solid #00c781;border-radius:18px;background:#10251e;color:#fff;font-size:13px;touch-action:manipulation}\n</style>
+
+<style id="emergency-home-interaction-fix">
+/* Keep the Reels layer completely out of the way unless Reels is selected. */
+#reelsPage.hidden{display:none!important;visibility:hidden!important;pointer-events:none!important}
+#reelsPage:not(.hidden){visibility:visible!important;pointer-events:auto!important}
+/* Restore normal document scrolling on mobile browsers. */
+html,body{height:auto!important;min-height:100%!important;overflow-x:hidden!important;overflow-y:auto!important}
+main.wrap{height:auto!important;max-height:none!important;min-height:100vh!important;overflow:visible!important;display:block!important;padding-bottom:110px!important}
+main.wrap>*{flex-shrink:initial!important}
+#bottomNav{z-index:200!important;pointer-events:auto!important}
+#sideDrawer.hidden,#drawerShade.hidden,#accountPage.hidden,#adminPage.hidden{display:none!important;pointer-events:none!important}
+</style>
 </body></html>
 
