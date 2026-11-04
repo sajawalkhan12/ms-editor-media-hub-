@@ -416,5 +416,33 @@ main.wrap>#reelsPage .reel-player{height:min(54dvh,620px)!important}
 #reelsPage .reel-overlay-info{position:absolute;left:12px;right:62px;bottom:18px;z-index:4;display:flex;flex-direction:column;gap:5px;color:#fff;text-shadow:0 1px 4px #000;background:linear-gradient(transparent,rgba(0,0,0,.45));padding-top:25px;font-size:13px;pointer-events:none}
 #reelsPage .reel-overlay-info b{font-size:15px}
 </style>
+
+<style id="ms-reels-tiktok-layout-v2">
+/* TikTok-like full-screen Reels while retaining MS Editor branding and existing handlers. */
+#reelsPage{display:flex;flex-direction:column;min-height:0}
+#reelsPage .reels-heading{display:flex;align-items:center;justify-content:center;gap:10px;padding:8px 12px;position:relative;z-index:2}
+#reelsPage .reels-heading strong{font-size:17px;color:var(--gold,#d6b45b)}
+#reelsPage .reels-heading span{font-size:11px;opacity:.75}
+#reelsPage #reelsFeed{width:100%;min-height:0;overflow-y:auto;scroll-snap-type:y mandatory;scrollbar-width:none}
+#reelsPage #reelsFeed::-webkit-scrollbar{display:none}
+#reelsPage .reel-card{position:relative;min-height:100%;height:100%;margin:0;padding:0;border:0;border-radius:0;background:#000;overflow:hidden;scroll-snap-align:start;scroll-snap-stop:always;display:flex;flex-direction:column}
+#reelsPage .reel-player{height:100%!important;min-height:64dvh;flex:1 1 auto;position:relative;background:#000;border-radius:0;overflow:hidden}
+#reelsPage .reel-player video,#reelsPage .reel-player iframe{width:100%!important;height:100%!important;max-height:none!important;object-fit:contain!important;background:#000;border:0}
+#reelsPage .reel-side-actions{right:10px;bottom:76px;gap:16px}
+#reelsPage .reel-side-actions button{width:46px;height:46px;min-width:46px;min-height:46px;background:rgba(10,10,10,.58);border:1px solid rgba(255,255,255,.18);box-shadow:0 2px 10px #0006}
+#reelsPage .reel-side-actions small{color:#fff}
+#reelsPage .reel-overlay-info{bottom:24px;right:66px;left:14px;padding:35px 8px 8px;background:linear-gradient(transparent,rgba(0,0,0,.7));}
+#reelsPage .reel-info{flex:0 0 auto;padding:0!important;margin:0!important;background:#080a09;color:#fff}
+#reelsPage .reel-info>.reel-title,#reelsPage .reel-info>.reel-desc,#reelsPage .reel-info>.reel-actions{display:none!important}
+#reelsPage .reel-comment-box{padding:8px 12px}
+#reelsPage .reel-comments{max-height:90px;overflow:auto;padding:0 12px}
+@media(max-width:700px){
+ main.wrap>#reelsPage #reelsFeed{height:calc(100dvh - 150px)!important;flex:1 1 auto!important}
+ main.wrap>#reelsPage .reel-card{height:100%!important;min-height:100%!important}
+ main.wrap>#reelsPage .reel-player{height:100%!important;min-height:100%!important}
+ #reelsPage .reels-heading span{display:none}
+ #reelsPage .reel-side-actions{right:8px;bottom:72px}
+}
+</style>
 </body></html>
 
