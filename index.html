@@ -320,7 +320,7 @@ host.querySelectorAll('textarea[data-emoji-longpress]').forEach(input=>{
     picker.classList.add('hidden');
   }));
 });
-host.querySelectorAll('[data-reel-send]').forEach(b=>b.onclick=async()=>{const id=b.dataset.reelSend,txt=$('reel-text-'+id).value.trim(),name=$('reel-name-'+id).value.trim()||'Visitor';if(!txt)return;try{await addSharedComment(id,name,txt);renderReels()}catch(e){showNotice('Comment save nahi hua: '+e.message)}});host.querySelectorAll('[data-reel-share]').forEach(b=>b.onclick=async()=>{const p=allPosts.find(x=>String(x.id)===b.dataset.reelShare),url=mediaUrl(p);try{if(navigator.share)await navigator.share({title:p.title||'Video',text:p.description||'',url});else{await navigator.clipboard.writeText(url);alert('Video link copied')}}catch{}});
+host.querySelectorAll('[data-reel-send]').forEach(b=>b.onclick=async e=>{e.preventDefault();const id=b.dataset.reelSend,input=$('reel-text-'+id),nameInput=$('reel-name-'+id),txt=input?.value.trim(),name=nameInput?.value.trim()||'Visitor';if(!txt){alert('Pehle comment likhein.');return}b.disabled=true;b.textContent='Posting...';try{await addSharedComment(id,name,txt);alert('Comment post ho gaya.');renderReels()}catch(e){alert('Comment post nahi hua: '+(e?.message||String(e)));b.disabled=false;b.textContent='Post comment'}});host.querySelectorAll('[data-reel-share]').forEach(b=>b.onclick=async()=>{const p=allPosts.find(x=>String(x.id)===b.dataset.reelShare),url=mediaUrl(p);try{if(navigator.share)await navigator.share({title:p.title||'Video',text:p.description||'',url});else{await navigator.clipboard.writeText(url);alert('Video link copied')}}catch{}});
 }
 function showMainPage(page){activeMainPage=page;const reels=page==='reels';$('reelsPage').classList.toggle('hidden',!reels);['hero','configNotice','homeCategories','quickActions','screenbar','tabs','mediaGrid','emptyState','searchBox','refreshBtn','engagementNotice','footer'].forEach(id=>{const el=$(id);if(el)el.classList.toggle('main-page-hidden',reels)});document.querySelectorAll('#bottomNav [data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===page));if(reels)renderReels();else{render();$('screenLabel').textContent='Posts';}window.scrollTo({top:0,behavior:'smooth'})}
 loadAppearance();makeTabs();loadPosts();
@@ -514,6 +514,17 @@ main.wrap>#reelsPage .reel-player{height:min(54dvh,620px)!important}
     display:block!important;font-size:13px!important;color:#fff!important;background:transparent!important;
   }
   body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-info{display:none!important}
+  /* Reveal the comment panel above the bottom navigation when a Reel's comment button is opened. */
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-info:has(.reel-comment-box:not(.hidden)){
+    display:block!important;position:fixed!important;left:8px!important;right:8px!important;
+    bottom:74px!important;z-index:120!important;max-height:48vh!important;overflow-y:auto!important;
+    padding:12px!important;border:1px solid #087c64!important;border-radius:14px!important;
+    background:rgba(5,18,16,.97)!important;color:#fff!important;box-shadow:0 4px 24px #000!important;
+  }
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-info:has(.reel-comment-box:not(.hidden))>.reel-title,
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-info:has(.reel-comment-box:not(.hidden))>.reel-desc,
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-info:has(.reel-comment-box:not(.hidden))>.reel-actions,
+  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-info:has(.reel-comment-box:not(.hidden))>.reel-comments{display:none!important}
   body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-side-actions{
     right:10px!important;bottom:78px!important;z-index:8!important;
   }
