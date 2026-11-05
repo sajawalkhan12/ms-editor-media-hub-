@@ -380,14 +380,13 @@ async function renderReels(){
   return '<article class="reel-card" data-reel-card="'+esc(p.id)+'"><div class="reel-player">'+player+
    '<div class="reel-side-actions">'+
    '<div class="reel-author-top">'+(avatar?'<img src="'+esc(avatar)+'" alt="">':'<span class="reel-avatar-fallback">👤</span>')+
-   '<span class="reel-author-name">'+esc(authorName)+'</span>'+
    (!isOwn&&p.created_by?'<button type="button" class="reel-follow-plus '+(isFollowing?'is-following':'')+'" data-reel-follow="'+esc(p.created_by)+'" data-following="'+(isFollowing?'1':'0')+'" aria-label="'+(isFollowing?'Following':'Follow')+'">'+(isFollowing?'✓':'+')+'</button>':'')+
    '</div>'+
    '<button class="reel-like-button '+(st.liked?'is-liked':'')+'" data-reel-like="'+esc(p.id)+'" aria-label="Like">♥<small>'+(st.likes||0)+'</small></button>'+
    '<button class="reel-comment-button" data-reel-comment="'+esc(p.id)+'" aria-label="Comments">●<small>'+(st.comments||[]).length+'</small></button>'+
    '<button class="reel-save-button '+(saved?'is-saved':'')+'" data-reel-bookmark="'+esc(p.id)+'" aria-label="Save">'+(saved?'▣':'▢')+'<small>Save</small></button>'+
    '<button data-reel-share="'+esc(p.id)+'" aria-label="Share">➤<small>Share</small></button></div>'+
-   '<div class="reel-overlay-info"><b>'+esc(p.title||'Untitled video')+'</b><span>'+esc(p.description||'')+'</span></div>'+
+   '<div class="reel-overlay-info"><strong class="reel-overlay-username">@'+esc(author?.username||author?.display_name||authorName)+'</strong><b>'+esc(p.title||'Untitled video')+'</b><span>'+esc(p.description||'')+'</span></div>'+
    '<div class="reel-quick-emoji hidden" data-reel-quick-emoji="'+esc(p.id)+'"><div class="reel-quick-emoji-title">Emoji comment bhejne ke liye tap karein</div><div class="reel-quick-emoji-list"><button type="button">😀</button><button type="button">😍</button><button type="button">😂</button><button type="button">🥰</button><button type="button">❤️</button><button type="button">🔥</button><button type="button">👍</button><button type="button">👏</button><button type="button">😢</button><button type="button">🙏</button></div><button type="button" class="reel-quick-emoji-close">Close</button></div></div>'+
    '<div class="reel-info"><div class="reel-title">'+esc(p.title||'Untitled video')+'</div><div class="reel-desc">'+esc(p.description||'')+'</div>'+
    '<div class="reel-comment-box hidden" id="reel-comment-'+esc(p.id)+'"><input id="reel-name-'+esc(p.id)+'" placeholder="Your name (optional)"><textarea class="reel-comment-input" id="reel-text-'+esc(p.id)+'" placeholder="Write a comment" data-emoji-longpress="1"></textarea><button type="button" class="reel-emoji-toggle" data-emoji-toggle="'+esc(p.id)+'">😊 Emoji</button><div class="reel-emoji-picker hidden" aria-label="Choose emoji"><button type="button">😀</button><button type="button">😍</button><button type="button">😂</button><button type="button">🥰</button><button type="button">❤️</button><button type="button">🔥</button><button type="button">👍</button><button type="button">👏</button><button type="button">😢</button><button type="button">🙏</button></div><small class="reel-emoji-hint">Comment box ko long press karein ya Emoji dabayein</small><button class="reel-post-comment" data-reel-send="'+esc(p.id)+'">➤ Post</button></div>'+
@@ -798,5 +797,38 @@ main.wrap>*{flex-shrink:initial!important}
    border-radius:16px!important;overflow:hidden!important}
  #reelsPage .reel-player{height:100%!important;min-height:0!important;border-radius:15px!important}
  #reelsPage .reel-player video,#reelsPage .reel-player iframe{object-fit:contain!important}
+}
+</style>
+
+<style id="reels-username-under-video-v5">
+@media(max-width:700px){
+ body:has(#reelsPage:not(.hidden)) #reelsPage .reel-author-top{
+  width:44px!important;height:44px!important;min-width:44px!important;
+  padding:0!important;position:relative!important;overflow:visible!important;
+  border:0!important;border-radius:50%!important;background:transparent!important;
+ }
+ body:has(#reelsPage:not(.hidden)) #reelsPage .reel-author-top img,
+ body:has(#reelsPage:not(.hidden)) #reelsPage .reel-avatar-fallback{
+  width:44px!important;height:44px!important;min-width:44px!important;
+  border-radius:50%!important;object-fit:cover!important;
+ }
+ body:has(#reelsPage:not(.hidden)) #reelsPage .reel-follow-plus{
+  position:absolute!important;left:50%!important;bottom:-9px!important;top:auto!important;
+  transform:translateX(-50%)!important;z-index:5!important;
+  width:25px!important;height:25px!important;min-width:25px!important;
+  border:2px solid #050505!important;
+ }
+ body:has(#reelsPage:not(.hidden)) #reelsPage .reel-overlay-info{
+  display:flex!important;flex-direction:column!important;align-items:flex-start!important;
+  gap:4px!important;
+ }
+ body:has(#reelsPage:not(.hidden)) #reelsPage .reel-overlay-username{
+  display:block!important;color:#fff!important;font-size:14px!important;
+  line-height:1.2!important;font-weight:800!important;text-shadow:0 1px 4px #000!important;
+  margin-bottom:1px!important;
+ }
+ body:has(#reelsPage:not(.hidden)) #reelsPage .reel-overlay-info>b{
+  display:block!important;font-size:14px!important;line-height:1.25!important;
+ }
 }
 </style>
