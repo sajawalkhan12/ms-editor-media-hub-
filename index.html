@@ -832,3 +832,27 @@ main.wrap>*{flex-shrink:initial!important}
  }
 }
 </style>
+
+
+<style id="reels-remove-heavy-black-shade-v6">
+/* Keep the actual video bright; remove the dark scrim behind the lower caption. */
+#reelsPage .reel-overlay-info,
+body:has(#reelsPage:not(.hidden)) #reelsPage .reel-overlay-info{
+  background:transparent!important;
+  background-image:none!important;
+  box-shadow:none!important;
+  -webkit-backdrop-filter:none!important;
+  backdrop-filter:none!important;
+}
+#reelsPage .reel-overlay-info::before,
+#reelsPage .reel-overlay-info::after{
+  content:none!important;
+  display:none!important;
+  background:none!important;
+}
+#reelsPage .reel-overlay-username,
+#reelsPage .reel-overlay-info>b,
+#reelsPage .reel-overlay-info{
+  text-shadow:0 1px 3px rgba(0,0,0,.72)!important;
+}
+</style>
