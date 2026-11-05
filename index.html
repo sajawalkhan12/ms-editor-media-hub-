@@ -358,55 +358,55 @@ $('savePostEdit').onclick=async()=>{if(!adminAuthorized||!session){$('editPostSt
 async function deletePost(id){if(!adminAuthorized||!session){alert('Only an authorized admin can delete posts.');return}const p=allPosts.find(x=>String(x.id)===String(id));if(!p||!confirm(`Delete "${p.title||'Untitled'}"? This cannot be undone.`))return;try{const {data:allowed,error:ae}=await sb.rpc('is_media_admin');if(ae||!allowed)throw Error('Admin permission could not be verified');const {error}=await sb.from('media_items').delete().eq('id',p.id);if(error)throw error;allPosts=allPosts.filter(x=>String(x.id)!==String(p.id));render();alert('Post deleted from database. Storage cleanup may need to be done separately.')}catch(e){alert('Delete failed: '+e.message)}}
 let activeMainPage='posts';
 function videoPosts(){return allPosts.filter(p=>{const u=mediaUrl(p);if(p.visibility==='private'||!u)return false;if(p.media_type==='reel')return true;if(['image','image_prompt','assets'].includes(p.media_type))return false;return !!youtubeId(p.external_url||u)||['song','tutorial','movie','trailer','video_prompt'].includes(p.media_type)||/\.(mp4|webm|mov|m4v|m3u8)(\?|$)/i.test(u)}).sort((a,b)=>new Date(b.created_at||0)-new Date(a.created_at||0))}
-function renderReels(){const host=$('reelsFeed');if(!host)return;const posts=videoPosts();host.innerHTML=posts.length?posts.map(p=>{const u=mediaUrl(p),yt=youtubeId(p.external_url||u),st=getStats(p.id),poster=posterUrl(p);const player=yt?youtubePlayer(yt,p.title||'Video'):('<video class="reel-video" controls playsinline preload="metadata" '+(poster?'poster="'+esc(poster)+'" ':'')+'src="'+esc(u)+'"></video>');const saved=JSON.parse(localStorage.getItem('msemh-reel-saved')||'[]').includes(String(p.id));return '<article class="reel-card" data-reel-card="'+esc(p.id)+'"><div class="reel-player">'+player+'<div class="reel-side-actions"><button data-reel-like="'+esc(p.id)+'">♥<small>'+(st.likes||0)+'</small></button><button data-reel-comment="'+esc(p.id)+'">●<small>'+(st.comments||[]).length+'</small></button><button data-reel-bookmark="'+esc(p.id)+'">'+(saved?'★':'☆')+'<small>Save</small></button><button data-reel-share="'+esc(p.id)+'">➤<small>Share</small></button></div><div class="reel-overlay-info"><b>'+esc(p.title||'Untitled video')+'</b><span>'+esc(p.description||'')+'</span></div><div class="reel-quick-emoji hidden" data-reel-quick-emoji="'+esc(p.id)+'"><div class="reel-quick-emoji-title">Emoji comment bhejne ke liye tap karein</div><div class="reel-quick-emoji-list"><button type="button">😀</button><button type="button">😍</button><button type="button">😂</button><button type="button">🥰</button><button type="button">❤️</button><button type="button">🔥</button><button type="button">👍</button><button type="button">👏</button><button type="button">😢</button><button type="button">🙏</button></div><button type="button" class="reel-quick-emoji-close">Close</button></div></div><div class="reel-info"><div class="reel-title">'+esc(p.title||'Untitled video')+'</div><div class="reel-desc">'+esc(p.description||'')+'</div><div class="reel-actions"><button data-reel-like="'+esc(p.id)+'">♥ '+(st.likes||0)+'</button><button data-reel-comment="'+esc(p.id)+'">Comment · '+(st.comments||[]).length+'</button><button data-reel-share="'+esc(p.id)+'">Share</button></div><div class="reel-comment-box hidden" id="reel-comment-'+esc(p.id)+'"><input id="reel-name-'+esc(p.id)+'" placeholder="Your name (optional)"><textarea class="reel-comment-input" id="reel-text-'+esc(p.id)+'" placeholder="Write a comment" data-emoji-longpress="1"></textarea><button type="button" class="reel-emoji-toggle" data-emoji-toggle="'+esc(p.id)+'">😊 Emoji</button><div class="reel-emoji-picker hidden" aria-label="Choose emoji"><button type="button">😀</button><button type="button">😍</button><button type="button">😂</button><button type="button">🥰</button><button type="button">❤️</button><button type="button">🔥</button><button type="button">👍</button><button type="button">👏</button><button type="button">😢</button><button type="button">🙏</button></div><small class="reel-emoji-hint">Emoji ke liye comment box par long press karein</small><button data-reel-send="'+esc(p.id)+'">Post comment</button></div><div class="reel-comments">'+(st.comments||[]).slice(-3).map(c=>'<p><b>'+esc(c.name||'Visitor')+':</b> '+esc(c.text)+'</p>').join('')+'</div></div></article>'}).join(''):'<div class="notice">Abhi koi video available nahi. Nayi aur purani uploaded videos yahan nazar aayengi.</div>';
-host.querySelectorAll('video.reel-video').forEach(v=>{v.addEventListener('ended',()=>{const card=v.closest('[data-reel-card]'),next=card?.nextElementSibling;if(next?.matches('[data-reel-card]')){next.scrollIntoView({behavior:'smooth',block:'start'});const nv=next.querySelector('video.reel-video');if(nv){nv.muted=true;nv.play().catch(()=>{})}}});});
-host.querySelectorAll('[data-reel-bookmark]').forEach(b=>b.onclick=()=>{const id=String(b.dataset.reelBookmark),arr=JSON.parse(localStorage.getItem('msemh-reel-saved')||'[]'),next=arr.includes(id)?arr.filter(x=>x!==id):[...arr,id];localStorage.setItem('msemh-reel-saved',JSON.stringify(next));b.innerHTML=(next.includes(id)?'★':'☆')+'<small>Save</small>'});
-host.querySelectorAll('[data-reel-like]').forEach(b=>b.onclick=async()=>{await toggleLike(b.dataset.reelLike);renderReels()});
+async function renderReels(){
+ const host=$('reelsFeed');if(!host)return;
+ const posts=videoPosts();
+ const authorIds=[...new Set(posts.map(p=>p.created_by).filter(Boolean))];
+ let authors={},followed=new Set();
+ if(authorIds.length){
+  try{const {data}=await sb.from('profiles').select('id,username,display_name,avatar_path').in('id',authorIds);(data||[]).forEach(x=>authors[String(x.id)]=x)}catch(e){}
+ }
+ if(currentMember&&authorIds.length){
+  try{const {data}=await sb.from('user_follows').select('following_id').eq('follower_id',currentMember.id).in('following_id',authorIds);followed=new Set((data||[]).map(x=>String(x.following_id)))}catch(e){}
+ }
+ host.innerHTML=posts.length?posts.map(p=>{
+  const u=mediaUrl(p),yt=youtubeId(p.external_url||u),st=getStats(p.id),poster=posterUrl(p),author=authors[String(p.created_by)]||null;
+  const authorName=author?(author.display_name||author.username||'Member'):(p.created_by?'Member':'MS Editor Media Hub');
+  const avatar=author?.avatar_path?profileImageUrl(author.avatar_path):'';
+  const isOwn=!!(currentMember&&String(currentMember.id)===String(p.created_by));
+  const isFollowing=followed.has(String(p.created_by));
+  const player=yt?youtubePlayer(yt,p.title||'Video'):('<video class="reel-video" controls playsinline preload="metadata" '+(poster?'poster="'+esc(poster)+'" ':'')+'src="'+esc(u)+'"></video>');
+  const saved=JSON.parse(localStorage.getItem('msemh-reel-saved')||'[]').includes(String(p.id));
+  return '<article class="reel-card" data-reel-card="'+esc(p.id)+'"><div class="reel-player">'+player+
+   '<div class="reel-author-top">'+(avatar?'<img src="'+esc(avatar)+'" alt="">':'<span class="reel-avatar-fallback">👤</span>')+
+   '<span class="reel-author-name">'+esc(authorName)+'</span>'+
+   (!isOwn&&p.created_by?'<button type="button" class="reel-follow-plus '+(isFollowing?'is-following':'')+'" data-reel-follow="'+esc(p.created_by)+'" data-following="'+(isFollowing?'1':'0')+'" aria-label="'+(isFollowing?'Following':'Follow')+'">'+(isFollowing?'✓':'+')+'</button>':'')+
+   '</div><div class="reel-side-actions">'+
+   '<button class="reel-like-button '+(st.liked?'is-liked':'')+'" data-reel-like="'+esc(p.id)+'" aria-label="Like">♥<small>'+(st.likes||0)+'</small></button>'+
+   '<button class="reel-comment-button" data-reel-comment="'+esc(p.id)+'" aria-label="Comments">●<small>'+(st.comments||[]).length+'</small></button>'+
+   '<button class="reel-save-button '+(saved?'is-saved':'')+'" data-reel-bookmark="'+esc(p.id)+'" aria-label="Save">'+(saved?'▣':'▢')+'<small>Save</small></button>'+
+   '<button data-reel-share="'+esc(p.id)+'" aria-label="Share">➤<small>Share</small></button></div>'+
+   '<div class="reel-overlay-info"><b>'+esc(p.title||'Untitled video')+'</b><span>'+esc(p.description||'')+'</span></div>'+
+   '<div class="reel-quick-emoji hidden" data-reel-quick-emoji="'+esc(p.id)+'"><div class="reel-quick-emoji-title">Emoji comment bhejne ke liye tap karein</div><div class="reel-quick-emoji-list"><button type="button">😀</button><button type="button">😍</button><button type="button">😂</button><button type="button">🥰</button><button type="button">❤️</button><button type="button">🔥</button><button type="button">👍</button><button type="button">👏</button><button type="button">😢</button><button type="button">🙏</button></div><button type="button" class="reel-quick-emoji-close">Close</button></div></div>'+
+   '<div class="reel-info"><div class="reel-title">'+esc(p.title||'Untitled video')+'</div><div class="reel-desc">'+esc(p.description||'')+'</div>'+
+   '<div class="reel-comment-box hidden" id="reel-comment-'+esc(p.id)+'"><input id="reel-name-'+esc(p.id)+'" placeholder="Your name (optional)"><textarea class="reel-comment-input" id="reel-text-'+esc(p.id)+'" placeholder="Write a comment" data-emoji-longpress="1"></textarea><button type="button" class="reel-emoji-toggle" data-emoji-toggle="'+esc(p.id)+'">😊 Emoji</button><div class="reel-emoji-picker hidden" aria-label="Choose emoji"><button type="button">😀</button><button type="button">😍</button><button type="button">😂</button><button type="button">🥰</button><button type="button">❤️</button><button type="button">🔥</button><button type="button">👍</button><button type="button">👏</button><button type="button">😢</button><button type="button">🙏</button></div><small class="reel-emoji-hint">Comment box ko long press karein ya Emoji dabayein</small><button class="reel-post-comment" data-reel-send="'+esc(p.id)+'">➤ Post</button></div>'+
+   '<div class="reel-comments">'+(st.comments||[]).slice(-3).map(c=>'<p><b>'+esc(c.name||'Visitor')+':</b> '+esc(c.text)+'</p>').join('')+'</div></div></article>'
+ }).join(''):'<div class="notice">Abhi koi video available nahi. Nayi aur purani uploaded videos yahan nazar aayengi.</div>';
+ host.querySelectorAll('video.reel-video').forEach(v=>v.addEventListener('ended',()=>{const next=v.closest('[data-reel-card]')?.nextElementSibling;if(next?.matches('[data-reel-card]')){next.scrollIntoView({behavior:'smooth',block:'start'});const nv=next.querySelector('video.reel-video');if(nv){nv.muted=true;nv.play().catch(()=>{})}}}));
+ host.querySelectorAll('[data-reel-bookmark]').forEach(b=>b.onclick=()=>{const id=String(b.dataset.reelBookmark),arr=JSON.parse(localStorage.getItem('msemh-reel-saved')||'[]'),next=arr.includes(id)?arr.filter(x=>x!==id):[...arr,id];localStorage.setItem('msemh-reel-saved',JSON.stringify(next));b.classList.toggle('is-saved',next.includes(id));b.innerHTML=(next.includes(id)?'▣':'▢')+'<small>Save</small>'});
+ host.querySelectorAll('[data-reel-like]').forEach(b=>b.onclick=async()=>{b.disabled=true;await toggleLike(b.dataset.reelLike);await renderReels()});
+ host.querySelectorAll('[data-reel-follow]').forEach(b=>b.onclick=async()=>{if(!currentMember){openAccountPage();return}const id=b.dataset.reelFollow,was=b.dataset.following==='1';if(String(id)===String(currentMember.id))return;b.disabled=true;try{const result=was?await sb.from('user_follows').delete().eq('follower_id',currentMember.id).eq('following_id',id):await sb.from('user_follows').insert({follower_id:currentMember.id,following_id:id});if(result.error)throw result.error;await renderReels()}catch(e){alert('Follow update nahi hua: '+e.message);b.disabled=false}});
  host.querySelectorAll('[data-reel-comment]').forEach(b=>{
- const id=b.dataset.reelComment;let hold=null,longPressed=false;
- const openComments=()=>{const box=$('reel-comment-'+id),panel=box?.closest('.reel-info');if(!box||!panel)return;const opening=box.classList.contains('hidden');host.querySelectorAll('.reel-comment-box').forEach(x=>x.classList.add('hidden'));host.querySelectorAll('.reel-info').forEach(x=>x.classList.remove('comment-open'));host.querySelectorAll('.reel-quick-emoji').forEach(x=>x.classList.add('hidden'));if(opening){box.classList.remove('hidden');panel.classList.add('comment-open')}};
- const openQuickEmoji=()=>{const panel=host.querySelector('[data-reel-quick-emoji="'+CSS.escape(id)+'"]');if(!panel)return;host.querySelectorAll('.reel-quick-emoji').forEach(x=>x.classList.add('hidden'));host.querySelectorAll('.reel-comment-box').forEach(x=>x.classList.add('hidden'));host.querySelectorAll('.reel-info').forEach(x=>x.classList.remove('comment-open'));panel.classList.remove('hidden')};
- b.addEventListener('pointerdown',()=>{longPressed=false;hold=setTimeout(()=>{longPressed=true;openQuickEmoji()},550)});
- const clearHold=()=>{if(hold){clearTimeout(hold);hold=null}};
- ['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,clearHold));
- b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(longPressed){longPressed=false;return}openComments()});
+  const id=b.dataset.reelComment;let hold=null,longPressed=false;
+  const openComments=()=>{const box=$('reel-comment-'+id),panel=box?.closest('.reel-info');if(!box||!panel)return;const opening=box.classList.contains('hidden');host.querySelectorAll('.reel-comment-box').forEach(x=>x.classList.add('hidden'));host.querySelectorAll('.reel-info').forEach(x=>x.classList.remove('comment-open'));host.querySelectorAll('.reel-quick-emoji').forEach(x=>x.classList.add('hidden'));if(opening){box.classList.remove('hidden');panel.classList.add('comment-open')}};
+  const openQuickEmoji=()=>{const panel=host.querySelector('[data-reel-quick-emoji="'+CSS.escape(id)+'"]');if(!panel)return;host.querySelectorAll('.reel-quick-emoji').forEach(x=>x.classList.add('hidden'));host.querySelectorAll('.reel-comment-box').forEach(x=>x.classList.add('hidden'));host.querySelectorAll('.reel-info').forEach(x=>x.classList.remove('comment-open'));panel.classList.remove('hidden')};
+  b.addEventListener('pointerdown',()=>{longPressed=false;hold=setTimeout(()=>{longPressed=true;openQuickEmoji()},550)});const clearHold=()=>{if(hold){clearTimeout(hold);hold=null}};['pointerup','pointercancel','pointerleave'].forEach(ev=>b.addEventListener(ev,clearHold));b.addEventListener('click',e=>{e.preventDefault();e.stopPropagation();if(longPressed){longPressed=false;return}openComments()});
  });
- host.querySelectorAll('.reel-quick-emoji').forEach(panel=>{
- const id=panel.dataset.reelQuickEmoji;
- panel.querySelector('.reel-quick-emoji-close')?.addEventListener('click',()=>panel.classList.add('hidden'));
- panel.querySelectorAll('.reel-quick-emoji-list button').forEach(btn=>btn.addEventListener('click',async()=>{
- const emoji=btn.textContent.trim();if(!emoji||btn.disabled)return;panel.querySelectorAll('button').forEach(x=>x.disabled=true);
- try{await addSharedComment(id,'Visitor',emoji);panel.classList.add('hidden')}
- catch(e){alert('Emoji comment post nahi hua: '+(e?.message||String(e)));panel.querySelectorAll('button').forEach(x=>x.disabled=false)}
- }));
- });
- host.querySelectorAll('[data-emoji-toggle]').forEach(b=>b.onclick=()=>{const box=$('reel-comment-'+b.dataset.emojiToggle),picker=box?.querySelector('.reel-emoji-picker');if(picker)picker.classList.toggle('hidden')});/* Reliable mobile long-press + tap fallback for opening the emoji picker. */
-host.querySelectorAll('textarea[data-emoji-longpress]').forEach(input=>{
-  const picker=input.parentElement.querySelector('.reel-emoji-picker');
-  let holdTimer=null;
-  const openPicker=()=>{picker.classList.remove('hidden');};
-  const clearHold=()=>{if(holdTimer!==null){clearTimeout(holdTimer);holdTimer=null;}};
-  const beginHold=()=>{clearHold();holdTimer=setTimeout(openPicker,500);};
-  input.addEventListener('pointerdown',beginHold);
-  input.addEventListener('pointerup',clearHold);
-  input.addEventListener('pointercancel',clearHold);
-  input.addEventListener('pointerleave',clearHold);
-  input.addEventListener('touchstart',beginHold,{passive:true});
-  input.addEventListener('touchend',clearHold,{passive:true});
-  input.addEventListener('touchcancel',clearHold,{passive:true});
-  input.addEventListener('contextmenu',e=>{e.preventDefault();openPicker();});
-  picker.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{
-    const emoji=btn.textContent.trim();if(!emoji)return;
-    const start=input.selectionStart??input.value.length;
-    const end=input.selectionEnd??start;
-    input.value=input.value.slice(0,start)+emoji+input.value.slice(end);
-    input.focus();
-    const pos=start+emoji.length;
-    try{input.setSelectionRange(pos,pos);}catch(e){}
-    picker.classList.add('hidden');
-  }));
-});
-host.querySelectorAll('[data-reel-send]').forEach(b=>b.onclick=async e=>{e.preventDefault();const id=b.dataset.reelSend,input=$('reel-text-'+id),nameInput=$('reel-name-'+id),txt=input?.value.trim(),name=nameInput?.value.trim()||'Visitor';if(!txt){alert('Pehle comment likhein.');return}b.disabled=true;b.textContent='Posting...';try{await addSharedComment(id,name,txt);alert('Comment post ho gaya.');renderReels()}catch(e){alert('Comment post nahi hua: '+(e?.message||String(e)));b.disabled=false;b.textContent='Post comment'}});host.querySelectorAll('[data-reel-share]').forEach(b=>b.onclick=async()=>{const p=allPosts.find(x=>String(x.id)===b.dataset.reelShare),url=mediaUrl(p);try{if(navigator.share)await navigator.share({title:p.title||'Video',text:p.description||'',url});else{await navigator.clipboard.writeText(url);alert('Video link copied')}}catch{}});
+ host.querySelectorAll('.reel-quick-emoji').forEach(panel=>{const id=panel.dataset.reelQuickEmoji;panel.querySelector('.reel-quick-emoji-close')?.addEventListener('click',()=>panel.classList.add('hidden'));panel.querySelectorAll('.reel-quick-emoji-list button').forEach(btn=>btn.addEventListener('click',async()=>{const emoji=btn.textContent.trim();if(!emoji||btn.disabled)return;panel.querySelectorAll('button').forEach(x=>x.disabled=true);try{await addSharedComment(id,'Visitor',emoji);panel.classList.add('hidden')}catch(e){alert('Emoji comment post nahi hua: '+(e?.message||String(e)));panel.querySelectorAll('button').forEach(x=>x.disabled=false)}}))});
+ host.querySelectorAll('[data-emoji-toggle]').forEach(b=>b.onclick=()=>{const box=$('reel-comment-'+b.dataset.emojiToggle),picker=box?.querySelector('.reel-emoji-picker');if(picker)picker.classList.toggle('hidden')});
+ host.querySelectorAll('textarea[data-emoji-longpress]').forEach(input=>{const picker=input.parentElement.querySelector('.reel-emoji-picker');let timer=null;const open=()=>picker.classList.remove('hidden'),clear=()=>{if(timer){clearTimeout(timer);timer=null}},begin=()=>{clear();timer=setTimeout(open,500)};input.addEventListener('pointerdown',begin);['pointerup','pointercancel','pointerleave'].forEach(ev=>input.addEventListener(ev,clear));input.addEventListener('contextmenu',e=>{e.preventDefault();open()});picker.querySelectorAll('button').forEach(btn=>btn.addEventListener('click',()=>{const emoji=btn.textContent.trim();if(!emoji)return;const a=input.selectionStart??input.value.length,z=input.selectionEnd??a;input.value=input.value.slice(0,a)+emoji+input.value.slice(z);input.focus();try{input.setSelectionRange(a+emoji.length,a+emoji.length)}catch(e){}picker.classList.add('hidden')}))});
+ host.querySelectorAll('[data-reel-send]').forEach(b=>b.onclick=async e=>{e.preventDefault();const id=b.dataset.reelSend,input=$('reel-text-'+id),nameInput=$('reel-name-'+id),txt=input?.value.trim(),name=nameInput?.value.trim()||'Visitor';if(!txt){alert('Pehle comment likhein.');return}b.disabled=true;b.textContent='Posting...';try{await addSharedComment(id,name,txt);renderReels()}catch(e){alert('Comment post nahi hua: '+(e?.message||String(e)));b.disabled=false;b.textContent='➤ Post'}});
+ host.querySelectorAll('[data-reel-share]').forEach(b=>b.onclick=async()=>{const p=allPosts.find(x=>String(x.id)===b.dataset.reelShare),url=mediaUrl(p);try{if(navigator.share)await navigator.share({title:p.title||'Video',text:p.description||'',url});else{await navigator.clipboard.writeText(url);alert('Video link copied')}}catch{}});
 }
 function showMainPage(page){activeMainPage=page;const reels=page==='reels';$('reelsPage').classList.toggle('hidden',!reels);['hero','configNotice','homeCategories','quickActions','screenbar','tabs','mediaGrid','emptyState','searchBox','refreshBtn','engagementNotice','footer'].forEach(id=>{const el=$(id);if(el)el.classList.toggle('main-page-hidden',reels)});document.querySelectorAll('#bottomNav [data-nav]').forEach(b=>b.classList.toggle('active',b.dataset.nav===page));if(reels)renderReels();else{render();$('screenLabel').textContent='Posts';}window.scrollTo({top:0,behavior:'smooth'})}
 
@@ -693,5 +693,27 @@ main.wrap>*{flex-shrink:initial!important}
 #bottomNav{z-index:200!important;pointer-events:auto!important}
 #sideDrawer.hidden,#drawerShade.hidden,#accountPage.hidden,#adminPage.hidden{display:none!important;pointer-events:none!important}
 </style>
+
+<style id="reels-profile-actions-v3">
+#reelsPage .reel-author-top{position:absolute;top:14px;right:9px;z-index:8;display:flex;align-items:center;gap:5px;max-width:150px;padding:4px 5px 4px 4px;border-radius:24px;background:rgba(0,0,0,.48);border:1px solid rgba(255,255,255,.22);backdrop-filter:blur(5px)}
+#reelsPage .reel-author-top img,#reelsPage .reel-avatar-fallback{width:38px;height:38px;min-width:38px;border-radius:50%;object-fit:cover;border:2px solid #fff;background:#25342e;display:grid;place-items:center}
+#reelsPage .reel-author-name{font-size:11px;font-weight:750;color:#fff;max-width:64px;overflow:hidden;text-overflow:ellipsis;white-space:nowrap}
+#reelsPage .reel-follow-plus{width:25px;height:25px;min-width:25px;min-height:25px;padding:0;border:0;border-radius:50%;background:#ff245b;color:#fff;font-size:21px;line-height:1;box-shadow:none}
+#reelsPage .reel-follow-plus.is-following{background:#fff;color:#111;font-size:15px}
+#reelsPage .reel-side-actions{gap:14px!important}
+#reelsPage .reel-side-actions button{background:transparent!important;border:0!important;box-shadow:none!important;color:#fff!important;text-shadow:0 1px 5px #000;font-size:31px!important;min-width:48px!important;min-height:48px!important;padding:0!important}
+#reelsPage .reel-side-actions button small{font-size:11px!important;font-weight:700;color:#fff!important;text-shadow:0 1px 4px #000}
+#reelsPage .reel-side-actions .reel-like-button{color:#fff!important}
+#reelsPage .reel-side-actions .reel-like-button.is-liked{color:#ff244f!important}
+#reelsPage .reel-side-actions .reel-save-button.is-saved{color:#ffd43b!important}
+#reelsPage .reel-side-actions .reel-comment-button{color:#fff!important}
+#reelsPage .reel-comment-box{background:rgba(5,18,16,.98);border:1px solid #087c64;border-radius:15px;padding:12px}
+#reelsPage .reel-comment-box input,#reelsPage .reel-comment-box textarea{width:100%;border:1px solid #315c56;border-radius:12px;background:#071c20;color:#fff;padding:11px;margin:5px 0}
+#reelsPage .reel-emoji-picker{background:#102522;border:1px solid #087c64;border-radius:12px;padding:8px}
+#reelsPage .reel-post-comment{display:block;margin:9px 0 0 auto;border:0;border-radius:22px;background:#fff;color:#111;padding:8px 18px;font-weight:800}
+#reelsPage .reel-post-comment:active{background:#ffd43b;color:#111}
+@media(max-width:700px){#reelsPage .reel-author-top{top:12px;right:8px}#reelsPage .reel-side-actions{right:7px;bottom:76px!important}}
+</style>
+
 </body></html>
 
