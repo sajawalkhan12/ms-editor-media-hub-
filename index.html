@@ -378,10 +378,11 @@ async function renderReels(){
   const player=yt?youtubePlayer(yt,p.title||'Video'):('<video class="reel-video" controls playsinline preload="metadata" '+(poster?'poster="'+esc(poster)+'" ':'')+'src="'+esc(u)+'"></video>');
   const saved=JSON.parse(localStorage.getItem('msemh-reel-saved')||'[]').includes(String(p.id));
   return '<article class="reel-card" data-reel-card="'+esc(p.id)+'"><div class="reel-player">'+player+
+   '<div class="reel-side-actions">'+
    '<div class="reel-author-top">'+(avatar?'<img src="'+esc(avatar)+'" alt="">':'<span class="reel-avatar-fallback">👤</span>')+
    '<span class="reel-author-name">'+esc(authorName)+'</span>'+
    (!isOwn&&p.created_by?'<button type="button" class="reel-follow-plus '+(isFollowing?'is-following':'')+'" data-reel-follow="'+esc(p.created_by)+'" data-following="'+(isFollowing?'1':'0')+'" aria-label="'+(isFollowing?'Following':'Follow')+'">'+(isFollowing?'✓':'+')+'</button>':'')+
-   '</div><div class="reel-side-actions">'+
+   '</div>'+
    '<button class="reel-like-button '+(st.liked?'is-liked':'')+'" data-reel-like="'+esc(p.id)+'" aria-label="Like">♥<small>'+(st.likes||0)+'</small></button>'+
    '<button class="reel-comment-button" data-reel-comment="'+esc(p.id)+'" aria-label="Comments">●<small>'+(st.comments||[]).length+'</small></button>'+
    '<button class="reel-save-button '+(saved?'is-saved':'')+'" data-reel-bookmark="'+esc(p.id)+'" aria-label="Save">'+(saved?'▣':'▢')+'<small>Save</small></button>'+
@@ -717,3 +718,85 @@ main.wrap>*{flex-shrink:initial!important}
 
 </body></html>
 
+
+
+<style id="reels-card-compact-position-v4">
+/* Compact Reels card: video, playback border and all actions stay together. */
+@media(max-width:700px){
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage{
+   position:fixed!important;inset:0 0 66px 0!important;width:100vw!important;
+   height:auto!important;min-height:0!important;max-height:none!important;
+   padding:0 8px!important;background:#02090d!important;
+ }
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage #reelsFeed{
+   height:100%!important;min-height:0!important;overflow-y:auto!important;
+   padding:8px 0 16px!important;scroll-snap-type:y mandatory!important;
+ }
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-card{
+   width:100%!important;height:76dvh!important;min-height:480px!important;
+   max-height:720px!important;margin:0 auto 14px!important;padding:0!important;
+   border:1px solid #176477!important;border-radius:16px!important;
+   overflow:hidden!important;background:#000!important;position:relative!important;
+   scroll-snap-align:center!important;
+ }
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-player{
+   position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+   min-height:0!important;max-height:none!important;border-radius:15px!important;
+   overflow:hidden!important;background:#000!important;
+ }
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-player video,
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-player iframe{
+   width:100%!important;height:100%!important;object-fit:contain!important;
+   background:#000!important;border:0!important;
+ }
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-side-actions{
+   position:absolute!important;right:8px!important;bottom:18px!important;top:auto!important;
+   z-index:15!important;display:flex!important;flex-direction:column!important;
+   align-items:center!important;gap:10px!important;
+ }
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-author-top{
+   position:relative!important;top:auto!important;right:auto!important;bottom:auto!important;
+   z-index:16!important;display:flex!important;align-items:center!important;
+   gap:4px!important;max-width:116px!important;padding:3px!important;
+   background:rgba(0,0,0,.68)!important;border:1px solid #ffffff66!important;
+   border-radius:24px!important;
+ }
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-author-top img,
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-avatar-fallback{
+   width:31px!important;height:31px!important;min-width:31px!important;
+ }
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-author-name{
+   max-width:48px!important;font-size:9px!important;
+ }
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-follow-plus{
+   display:flex!important;visibility:visible!important;opacity:1!important;
+   width:25px!important;height:25px!important;min-width:25px!important;min-height:25px!important;
+   padding:0!important;background:#ff245b!important;color:#fff!important;
+   border:0!important;border-radius:50%!important;font-size:20px!important;line-height:1!important;
+ }
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-follow-plus.is-following{
+   background:#fff!important;color:#111!important;font-size:14px!important;
+ }
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-side-actions>button{
+   width:42px!important;height:42px!important;min-width:42px!important;min-height:42px!important;
+   font-size:27px!important;background:rgba(0,0,0,.42)!important;
+   border:0!important;border-radius:50%!important;padding:0!important;
+ }
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-overlay-info{
+   left:10px!important;right:58px!important;bottom:12px!important;z-index:12!important;
+   padding:24px 8px 7px!important;background:linear-gradient(transparent,#000b)!important;
+ }
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-info{display:none!important}
+ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-info.comment-open{
+   display:block!important;position:fixed!important;left:8px!important;right:8px!important;
+   bottom:74px!important;z-index:220!important;max-height:48vh!important;
+ }
+}
+@media(min-width:701px){
+ #reelsPage .reel-card{height:76vh!important;min-height:520px!important;max-height:760px!important;
+   width:min(520px,100%)!important;margin:12px auto!important;border:1px solid #176477!important;
+   border-radius:16px!important;overflow:hidden!important}
+ #reelsPage .reel-player{height:100%!important;min-height:0!important;border-radius:15px!important}
+ #reelsPage .reel-player video,#reelsPage .reel-player iframe{object-fit:contain!important}
+}
+</style>
