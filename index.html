@@ -1115,4 +1115,18 @@ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-info{
  body:has(#reelsPage:not(.hidden)) main.wrap>header.top{flex:0 0 auto!important}
 }
 </style>
+
+<style id="reels-screen-fill-v10">
+/* Final Reels sizing: use every pixel below the fixed site header; no side/bottom gutters. */
+body:has(#reelsPage:not(.hidden)) main.wrap{width:100%!important;max-width:none!important;height:100dvh!important;min-height:0!important;max-height:100dvh!important;padding:0!important;margin:0!important;gap:0!important;display:flex!important;flex-direction:column!important;overflow:hidden!important}
+body:has(#reelsPage:not(.hidden)) main.wrap>header.top{flex:0 0 auto!important;width:100%!important;margin:0!important}
+body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage{display:flex!important;flex:1 1 0!important;width:100%!important;height:0!important;min-height:0!important;max-height:none!important;margin:0!important;padding:0!important;overflow:hidden!important}
+body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reels-heading{display:none!important}
+body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage #reelsFeed{display:flex!important;flex:1 1 0!important;flex-direction:column!important;width:100%!important;height:0!important;min-height:0!important;margin:0!important;padding:0!important;gap:0!important;overflow-y:auto!important;overflow-x:hidden!important;scroll-snap-type:y mandatory!important}
+body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-card{position:relative!important;display:block!important;flex:0 0 100%!important;width:100%!important;height:100%!important;min-height:100%!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;overflow:hidden!important;background:#000!important;scroll-snap-align:start!important}
+body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-player{position:absolute!important;inset:0!important;width:100%!important;height:100%!important;min-height:0!important;max-height:none!important;margin:0!important;padding:0!important;border:0!important;border-radius:0!important;background:#000!important;overflow:hidden!important}
+body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-player video,body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-player iframe{display:block!important;width:100%!important;height:100%!important;min-width:100%!important;min-height:100%!important;max-width:none!important;max-height:none!important;object-fit:cover!important;background:#000!important;border:0!important}
+@media(max-width:700px){body:has(#reelsPage:not(.hidden)) main.wrap{padding:0!important}body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage,body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage #reelsFeed,body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-card,body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-player{width:100vw!important}}
+</style>
+
 </body></html>
