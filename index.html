@@ -1129,4 +1129,47 @@ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-player video,body:h
 @media(max-width:700px){body:has(#reelsPage:not(.hidden)) main.wrap{padding:0!important}body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage,body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage #reelsFeed,body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-card,body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-player{width:100vw!important}}
 </style>
 
+
+<style id="reels-9x16-no-bottom-gap-v11">
+/* Exact 9:16 reel frame, centered in the space between the site header and bottom navigation. */
+body:has(#reelsPage:not(.hidden)){overflow:hidden!important}
+body:has(#reelsPage:not(.hidden)) main.wrap{height:auto!important;min-height:0!important;max-height:none!important;overflow:visible!important;padding:0!important;margin:0!important}
+body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage{
+ position:fixed!important;z-index:8!important;
+ top:calc(env(safe-area-inset-top) + 62px)!important;
+ bottom:calc(70px + env(safe-area-inset-bottom))!important;
+ left:0!important;right:0!important;
+ display:flex!important;align-items:center!important;justify-content:center!important;
+ width:100vw!important;height:auto!important;min-height:0!important;max-height:none!important;
+ margin:0!important;padding:0!important;overflow:hidden!important;background:#000!important;
+}
+body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reels-heading{display:none!important}
+body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage #reelsFeed{
+ display:block!important;position:relative!important;flex:0 0 auto!important;
+ width:min(100vw,calc((100dvh - 132px - env(safe-area-inset-top) - env(safe-area-inset-bottom))*0.5625))!important;
+ height:min(calc(100dvh - 132px - env(safe-area-inset-top) - env(safe-area-inset-bottom)),177.7778vw)!important;
+ min-height:0!important;max-height:none!important;margin:0 auto!important;padding:0!important;
+ overflow-y:auto!important;overflow-x:hidden!important;scroll-snap-type:y mandatory!important;
+ background:#000!important;scrollbar-width:none!important;
+}
+body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-card{
+ display:block!important;position:relative!important;
+ width:100%!important;height:100%!important;min-height:100%!important;
+ margin:0!important;padding:0!important;border:0!important;border-radius:0!important;
+ overflow:hidden!important;background:#000!important;scroll-snap-align:start!important;
+}
+body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-player{
+ position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+ min-height:0!important;max-height:none!important;margin:0!important;padding:0!important;
+ border:0!important;border-radius:0!important;background:#000!important;overflow:hidden!important;
+}
+body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-player video,
+body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-player iframe{
+ display:block!important;width:100%!important;height:100%!important;
+ min-width:100%!important;min-height:100%!important;max-width:none!important;max-height:none!important;
+ aspect-ratio:9/16!important;object-fit:cover!important;background:#000!important;border:0!important;
+}
+body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-side-actions{right:8px!important;bottom:74px!important}
+</style>
+
 </body></html>
