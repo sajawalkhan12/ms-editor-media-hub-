@@ -226,7 +226,7 @@ header.top .brand{flex:1 1 100%!important;min-width:0}
 @media(max-width:600px){header.top{margin:0 -8px 8px!important;padding:8px!important}#topNavigation{gap:5px;padding-bottom:7px}#topNavigation .top-nav-button{font-size:12px;padding:7px 11px;min-height:36px}.account-top-button,.gear-button{font-size:12px!important;min-height:36px!important;padding:6px 9px!important}}
 </style>\n</head>
 <body><main class="wrap">
-<header class="top"><div class="brand"><div class="logo" id="brandLogo" aria-label="Website logo"></div><div><h1 id="siteTitle">MS Editor Media Hub</h1><small>Video Songs • Tutorials • Prompts</small></div></div><button class="secondary account-top-button" id="accountOpen" aria-label="User profile">👤 Profile</button><button class="secondary gear-button" id="menuToggle" aria-label="Open settings menu" aria-expanded="false">⚙️ Settings</button><nav id="topNavigation" aria-label="Main navigation"><button type="button" class="top-nav-button active" data-topnav="home">⌂ Home</button><button type="button" class="top-nav-button" data-topnav="tutorial">▷ Video Tutorial</button><button type="button" class="top-nav-button" data-topnav="song">♫ Video Songs</button><button type="button" class="top-nav-button" data-topnav="video_prompt">✧ Video Prompt</button><button type="button" class="top-nav-button" data-topnav="image_prompt">▧ Image Prompt</button></nav></header><div id="drawerShade" class="drawer-shade hidden"></div><aside id="sideDrawer" class="side-drawer" aria-label="Settings and navigation" aria-hidden="true"><div class="drawer-head"><strong>MS Editor Menu</strong><button class="secondary" id="drawerClose" aria-label="Close menu">✕</button></div><div class="drawer-section"><span class="drawer-label">Navigation</span><button class="secondary drawer-action" id="homeBtn">⌂ Home</button><button class="secondary drawer-action" id="homeUploadsBtn">▣ Home · Uploaded Media</button><button class="secondary drawer-action" id="backBtn">‹ Back</button><button class="secondary drawer-action" id="exitBtn">Exit App</button></div><div class="drawer-section"><span class="drawer-label">Categories</span><div id="drawerCategories" class="drawer-categories"></div></div><div class="drawer-section"><span class="drawer-label">Your account</span><button class="secondary drawer-action" id="drawerAccount">👤 Sign up / Login / My Profile</button></div><div class="drawer-section"><span class="drawer-label">Admin & appearance</span><button class="secondary drawer-action" id="loginToggle">♙ Admin Login</button><button class="secondary drawer-action" id="settingsToggle">▧ Cover Image & Logo</button><button class="secondary drawer-action" id="drawerUpload">↑ Upload Media</button></div><p class="drawer-note">Home · Uploaded Media, Open Media Hub, Video Songs, Video Tutorial, Video Prompt, Image Prompt, Presets & Assets aur Tutorials yahan milenge. Admin login, cover/logo aur Upload Media bhi isi menu mein hain.</p></aside>
+<header class="top"><div class="brand"><div class="logo" id="brandLogo" aria-label="Website logo"></div><div><h1 id="siteTitle">MS Editor Media Hub</h1><small>Video Songs • Tutorials • Prompts</small></div></div><button class="secondary account-top-button" id="accountOpen" aria-label="User profile">👤 Profile</button><button class="secondary gear-button" id="menuToggle" aria-label="Open settings menu" aria-expanded="false">⚙️ Settings</button><nav id="topNavigation" aria-label="Main navigation"><button type="button" class="top-nav-button" data-topnav="reels">▶ Reels</button><button type="button" class="top-nav-button" data-topnav="home">⌂ Home</button><button type="button" class="top-nav-button" data-topnav="tutorial">▷ Video Tutorial</button><button type="button" class="top-nav-button" data-topnav="song">♫ Video Songs</button><button type="button" class="top-nav-button" data-topnav="video_prompt">✧ Video Prompt</button><button type="button" class="top-nav-button" data-topnav="image_prompt">▧ Image Prompt</button></nav></header><div id="drawerShade" class="drawer-shade hidden"></div><aside id="sideDrawer" class="side-drawer" aria-label="Settings and navigation" aria-hidden="true"><div class="drawer-head"><strong>MS Editor Menu</strong><button class="secondary" id="drawerClose" aria-label="Close menu">✕</button></div><div class="drawer-section"><span class="drawer-label">Navigation</span><button class="secondary drawer-action" id="homeBtn">⌂ Home</button><button class="secondary drawer-action" id="homeUploadsBtn">▣ Home · Uploaded Media</button><button class="secondary drawer-action" id="backBtn">‹ Back</button><button class="secondary drawer-action" id="exitBtn">Exit App</button></div><div class="drawer-section"><span class="drawer-label">Categories</span><div id="drawerCategories" class="drawer-categories"></div></div><div class="drawer-section"><span class="drawer-label">Your account</span><button class="secondary drawer-action" id="drawerAccount">👤 Sign up / Login / My Profile</button></div><div class="drawer-section"><span class="drawer-label">Admin & appearance</span><button class="secondary drawer-action" id="loginToggle">♙ Admin Login</button><button class="secondary drawer-action" id="settingsToggle">▧ Cover Image & Logo</button><button class="secondary drawer-action" id="drawerUpload">↑ Upload Media</button></div><p class="drawer-note">Home · Uploaded Media, Open Media Hub, Video Songs, Video Tutorial, Video Prompt, Image Prompt, Presets & Assets aur Tutorials yahan milenge. Admin login, cover/logo aur Upload Media bhi isi menu mein hain.</p></aside>
 <section id="accountPage" class="account-page hidden" aria-label="User account">
  <div class="account-topline"><strong>MS Editor Member Account</strong><button type="button" class="secondary" id="accountClose">✕ Close</button></div>
  <div id="accountAuthBox" class="account-card">
@@ -450,7 +450,7 @@ $('profileSignOut').onclick=async()=>{if(sb)await sb.auth.signOut();session=null
 
 loadAppearance();makeTabs();loadPosts();
 // Top navigation replaces the fixed bottom navigation.
-document.querySelectorAll("#topNavigation [data-topnav]").forEach(b=>b.addEventListener("click",()=>{const key=b.dataset.topnav;document.querySelectorAll("#topNavigation [data-topnav]").forEach(x=>x.classList.toggle("active",x===b));closeAdminPage();showMainPage("posts");if(key==="home"){goHome();return}setCategory(key)}));
+document.querySelectorAll("#topNavigation [data-topnav]").forEach(b=>b.addEventListener("click",()=>{const key=b.dataset.topnav;document.querySelectorAll("#topNavigation [data-topnav]").forEach(x=>x.classList.toggle("active",x===b));closeAdminPage();showMainPage("posts");if(key==="reels"){showMainPage("reels");return}if(key==="home"){showMainPage("posts");goHome();return}showMainPage("posts");setCategory(key)}));
 
 
 // Bottom navigation: Video Prompt and Image Prompt open separate category feeds.
@@ -766,6 +766,66 @@ main.wrap{padding-bottom:14px!important}
  body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-player iframe{
    width:100%!important;height:100%!important;object-fit:cover!important;
  }
+}
+</style>
+
+<style id="fixed-header-post-scroll-and-reels-button">
+/* Keep branding and navigation fixed; only the post feed scrolls on the Home/posts screen. */
+html,body{height:100%!important;min-height:100%!important;overflow:hidden!important}
+main.wrap{
+ height:100dvh!important;min-height:0!important;max-height:100dvh!important;
+ display:flex!important;flex-direction:column!important;overflow:hidden!important;
+ padding-bottom:12px!important;gap:0!important
+}
+main.wrap>header.top{position:relative!important;top:auto!important;z-index:80!important;flex:0 0 auto!important}
+main.wrap>#hero,main.wrap>#configNotice,main.wrap>#homeCategories,
+main.wrap>#screenbar,main.wrap>#tabs,main.wrap>.tools,
+main.wrap>#engagementNotice{flex:0 0 auto!important}
+main.wrap>#mediaGrid{
+ display:grid!important;grid-template-columns:minmax(0,1fr)!important;
+ flex:1 1 0!important;height:0!important;min-height:0!important;
+ overflow-x:hidden!important;overflow-y:auto!important;
+ overscroll-behavior-y:contain!important;-webkit-overflow-scrolling:touch!important;
+ align-content:start!important;padding-bottom:18px!important
+}
+main.wrap>#emptyState{flex:0 0 auto!important}
+main.wrap>.footer{display:none!important}
+#bottomNav{display:none!important}
+#topNavigation .top-nav-button[data-topnav="reels"]{background:#00c781!important;color:#00160e!important;border-color:#00c781!important}
+#topNavigation .top-nav-button.active{background:#00e5f2!important;color:#001419!important;border-color:#00e5f2!important}
+#reelsPage.hidden{display:none!important}
+#reelsPage:not(.hidden){
+ display:flex!important;flex:1 1 0!important;height:0!important;min-height:0!important;
+ max-height:none!important;overflow:hidden!important;background:#02090d!important
+}
+#reelsPage #reelsFeed{
+ flex:1 1 0!important;height:0!important;min-height:0!important;width:100%!important;
+ overflow-y:auto!important;overflow-x:hidden!important;scroll-snap-type:y mandatory!important;
+ overscroll-behavior-y:contain!important;-webkit-overflow-scrolling:touch!important;
+ display:flex!important;flex-direction:column!important;align-items:center!important;
+ gap:12px!important;padding:8px 0 18px!important
+}
+#reelsPage .reel-card{
+ position:relative!important;flex:0 0 auto!important;
+ width:min(100%,420px)!important;height:min(76dvh,760px)!important;
+ min-height:0!important;max-height:760px!important;aspect-ratio:9/16!important;
+ margin:0 auto!important;padding:0!important;overflow:hidden!important;
+ border:1px solid #176477!important;border-radius:16px!important;
+ background:#000!important;scroll-snap-align:center!important
+}
+#reelsPage .reel-player{
+ position:absolute!important;inset:0!important;width:100%!important;height:100%!important;
+ min-height:0!important;max-height:none!important;border-radius:15px!important;
+ overflow:hidden!important;background:#000!important
+}
+#reelsPage .reel-player video,#reelsPage .reel-player iframe{
+ display:block!important;width:100%!important;height:100%!important;
+ max-height:none!important;object-fit:contain!important;background:#000!important;border:0!important
+}
+@media(max-width:600px){
+ main.wrap{padding:0 8px 8px!important}
+ main.wrap>header.top{margin:0 -8px 6px!important}
+ #reelsPage .reel-card{width:min(calc(100vw - 16px),420px)!important;height:min(76dvh,720px)!important}
 }
 </style>
 </body></html>
