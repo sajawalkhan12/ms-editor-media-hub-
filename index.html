@@ -905,11 +905,24 @@ body:has(#reelsPage:not(.hidden)) #reelsPage .reel-overlay-info{
 <style id="desktop-top-navigation-final">
 body{padding-bottom:0!important}
 main.wrap{padding-bottom:18px!important}
-header.top{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:8px!important}
-header.top .brand{flex:1 1 100%!important;min-width:0}
-#topNavigation{display:flex!important;align-items:center;gap:7px;width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;padding:5px 1px 8px;scrollbar-width:thin;white-space:nowrap}
-#topNavigation .top-nav-button{flex:0 0 auto;min-height:38px;padding:8px 13px;border:1px solid #14596b;border-radius:20px;background:#08232e;color:#d9f8fc;font-size:13px;font-weight:700;white-space:nowrap;box-shadow:none}
+header.top{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:11px!important;padding:12px 14px!important}
+header.top .brand{flex:1 1 100%!important;min-width:0!important;gap:12px!important}
+header.top .logo{width:50px!important;height:50px!important;flex:0 0 50px!important}
+header.top h1{font-size:22px!important;line-height:1.25!important}
+header.top .brand small{font-size:12px!important;line-height:1.35!important}
+.account-top-button,.gear-button{min-height:40px!important;padding:8px 13px!important;font-size:13px!important;border-radius:9px!important}
+#topNavigation{display:flex!important;align-items:center;gap:8px;width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;padding:6px 1px 9px;scrollbar-width:thin;white-space:nowrap}
+#topNavigation .top-nav-button{flex:0 0 auto;min-height:42px;padding:9px 15px;border:1px solid #14596b;border-radius:10px;background:#08232e;color:#d9f8fc;font-size:14px;font-weight:700;white-space:nowrap;box-shadow:none}
 #topNavigation .top-nav-button.active{background:#00e5f2;color:#001419;border-color:#00e5f2}
 #bottomNav{display:none!important}
-@media(max-width:600px){header.top{margin:0 -8px 8px!important;padding:8px!important}#topNavigation{gap:5px;padding-bottom:7px}#topNavigation .top-nav-button{font-size:12px;padding:7px 11px;min-height:36px}.account-top-button,.gear-button{font-size:12px!important;min-height:36px!important;padding:6px 9px!important}}
+@media(max-width:600px){
+ header.top{margin:0 -8px 8px!important;padding:10px 12px!important;gap:9px!important}
+ header.top .brand{gap:9px!important}
+ header.top .logo{width:43px!important;height:43px!important;flex-basis:43px!important}
+ header.top h1{font-size:18px!important;line-height:1.2!important}
+ header.top .brand small{font-size:10px!important}
+ #topNavigation{gap:7px;padding:5px 1px 8px}
+ #topNavigation .top-nav-button{font-size:13px;padding:8px 12px;min-height:40px;border-radius:9px}
+ .account-top-button,.gear-button{font-size:13px!important;min-height:39px!important;padding:7px 11px!important}
+}
 </style>
