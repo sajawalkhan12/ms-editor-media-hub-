@@ -887,3 +887,15 @@ body:has(#reelsPage:not(.hidden)) #reelsPage .reel-overlay-info{
  }
 }
 </style>
+
+<style id="desktop-top-navigation-final">
+body{padding-bottom:0!important}
+main.wrap{padding-bottom:18px!important}
+header.top{display:flex!important;flex-wrap:wrap!important;align-items:center!important;gap:8px!important}
+header.top .brand{flex:1 1 100%!important;min-width:0}
+#topNavigation{display:flex!important;align-items:center;gap:7px;width:100%;min-width:0;overflow-x:auto;overflow-y:hidden;padding:5px 1px 8px;scrollbar-width:thin;white-space:nowrap}
+#topNavigation .top-nav-button{flex:0 0 auto;min-height:38px;padding:8px 13px;border:1px solid #14596b;border-radius:20px;background:#08232e;color:#d9f8fc;font-size:13px;font-weight:700;white-space:nowrap;box-shadow:none}
+#topNavigation .top-nav-button.active{background:#00e5f2;color:#001419;border-color:#00e5f2}
+#bottomNav{display:none!important}
+@media(max-width:600px){header.top{margin:0 -8px 8px!important;padding:8px!important}#topNavigation{gap:5px;padding-bottom:7px}#topNavigation .top-nav-button{font-size:12px;padding:7px 11px;min-height:36px}.account-top-button,.gear-button{font-size:12px!important;min-height:36px!important;padding:6px 9px!important}}
+</style>
