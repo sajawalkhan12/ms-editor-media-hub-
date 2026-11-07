@@ -484,7 +484,7 @@ $('publishMemberPost').onclick=async()=>{
  if(file.size>(type==='image'?25:500)*1024*1024){$('memberPostStatus').textContent=type==='image'?'Image 25 MB se chhoti honi chahiye.':'Video 500 MB se chhoti honi chahiye.';return}
  try{
   $('publishMemberPost').disabled=true;$('memberPostStatus').textContent='Media upload ho raha hai...';
-  const uid=currentMember.id,safeName=file.name.replace(/[^\\w.\\-]/g,'_');
+  const uid=currentMember.id,safeName=file.name.replace(/[^a-zA-Z0-9._-]/g,'_');
   const path=visibility==='public'?'user-posts/'+uid+'/'+Date.now()+'-'+safeName:uid+'/'+Date.now()+'-'+safeName;
   const bucket=visibility==='public'?'media':'private-user-posts';
   const {error:upError}=await sb.storage.from(bucket).upload(path,file,{upsert:false,contentType:file.type});if(upError)throw upError;
