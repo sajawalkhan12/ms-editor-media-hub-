@@ -261,7 +261,7 @@ header.top .brand{flex:1 1 100%!important;min-width:0}
   <div class="tools profile-edit-form-item hidden"><button type="button" class="secondary" id="chooseProfilePhoto">Upload profile photo</button><button type="button" class="secondary" id="chooseProfileCover">Upload cover image</button></div>
   <p class="muted profile-image-hint profile-edit-form-item hidden">Profile photo ya cover badalne ke liye 🖍️ icon dabayein, phir Save my profile karein.</p>
   <button type="button" id="saveMyProfile" class="profile-edit-form-item hidden">Save my profile</button>
-  <button type="button" class="secondary profile-edit-form-item hidden" id="profileSignOut">Sign out</button>
+  <div class="profile-account-actions"><button type="button" class="danger" id="profileSignOut">↪ Log Out</button></div>
   <div id="profileStatus" class="notice hidden profile-edit-form-item" role="status"></div>
   <section class="member-reels-section">
    <button type="button" id="toggleMemberPost" class="secondary">＋ Create Post</button>
@@ -1239,6 +1239,7 @@ body:has(#reelsPage:not(.hidden)) main.wrap>#reelsPage .reel-side-actions{right:
  .account-topline{position:sticky!important;top:0!important;padding:8px 0!important;background:#031019f2!important;z-index:3!important}
  #myProfileBox{margin-left:auto!important;margin-right:auto!important}
 }
+.profile-account-actions{display:flex;justify-content:flex-end;margin:14px 0 4px;padding-top:12px;border-top:1px solid #14596b}.profile-account-actions #profileSignOut{min-width:120px;font-weight:800}
 </style>
 
 <!-- Retry GitHub Pages deployment after queued deployment timeout -->
