@@ -152,7 +152,7 @@ header.top{position:sticky;top:0;z-index:20;background:#031019f5;padding:8px 0;b
 .account-card input,.account-card textarea{width:100%;padding:12px;border:1px solid #14596b;border-radius:10px;background:#061720;color:#fff}
 .account-tabs{display:flex;gap:8px;margin:14px 0}
 .account-tabs button{flex:1;border-radius:10px}
-.profile-edit-cover{position:relative}.profile-edit-icon{position:absolute;z-index:4;width:36px;height:36px;min-width:36px;min-height:36px;padding:0;border-radius:50%;display:grid;place-items:center;background:#061923;border:2px solid #00e5f2;color:#fff;font-size:18px;box-shadow:0 3px 12px #0009}.cover-edit-icon{right:12px;top:12px}.avatar-edit-icon{right:-4px;bottom:0}.profile-file-hidden{display:none!important}.profile-image-hint{font-size:12px;margin:8px 0 14px}.member-reels-section{margin-top:18px}.member-reels-section>.panel{margin-top:12px}.member-reel-item{background:#071a22;border:1px solid #14596b;border-radius:12px;padding:12px;margin:10px 0}.member-reel-item video{width:100%;max-height:360px;border-radius:9px;background:#000}.member-reel-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:7px 0}.member-reel-private{color:#f4c45e}
+.profile-edit-cover{position:relative}.profile-edit-icon{position:absolute;z-index:4;width:36px;height:36px;min-width:36px;min-height:36px;padding:0;border-radius:50%;display:grid;place-items:center;background:#061923;border:2px solid #00e5f2;color:#fff;font-size:18px;box-shadow:0 3px 12px #0009}.cover-edit-icon{right:12px;top:12px}.avatar-edit-icon{right:-4px;bottom:0}.profile-file-hidden{display:none!important}.profile-image-hint{font-size:12px;margin:8px 0 14px}.member-posts-section,.member-reels-section{margin-top:18px}.member-posts-section>.panel,.member-reels-section>.panel{margin-top:12px}.member-reel-item{background:#071a22;border:1px solid #14596b;border-radius:12px;padding:12px;margin:10px 0}.member-reel-item video{width:100%;max-height:360px;border-radius:9px;background:#000}.member-reel-meta{display:flex;gap:8px;flex-wrap:wrap;align-items:center;margin:7px 0}.member-reel-private{color:#f4c45e}
 .profile-cover{height:170px;border-radius:14px;background:linear-gradient(120deg,#075064,#061720);background-size:cover;background-position:center;position:relative;margin-bottom:62px;border:1px solid #14596b}
 .profile-avatar{position:absolute;left:18px;bottom:-48px;width:96px;height:96px;border-radius:50%;border:4px solid #061923;background:#0b3440;display:grid;place-items:center;font-size:35px;background-size:cover;background-position:center;color:white}
 @media(max-width:600px){.account-page{padding:10px}.account-card{padding:14px}.profile-cover{height:135px}}
@@ -250,7 +250,7 @@ header.top .brand{flex:1 1 100%!important;min-width:0}
  <div id="myProfileBox" class="account-card hidden">
   <div class="profile-cover profile-edit-cover" id="profileCoverPreview"><button type="button" class="profile-edit-icon cover-edit-icon" id="editCoverImage" aria-label="Change cover image" title="Change cover image">🖍️</button><div class="profile-avatar" id="profileAvatarPreview">👤<button type="button" class="profile-edit-icon avatar-edit-icon" id="editAvatarImage" aria-label="Change profile photo" title="Change profile photo">🖍️</button></div></div>
   <h2 id="profileHeading">My Profile</h2><p id="profileUsernameLabel" class="muted"></p><p id="profileEmail" class="muted"></p>
-  <div class="member-stats"><button type="button" class="secondary" id="showFollowers">👥 <b id="followerCount">0</b> Followers</button><button type="button" class="secondary" id="showFollowing">➜ <b id="followingCount">0</b> Following</button></div>
+  <div class="member-stats"><button type="button" class="secondary" id="showFollowers">👥 <b id="followerCount">0</b> Followers</button><button type="button" class="secondary" id="showFollowing">➜ <b id="followingCount">0</b> Following</button><button type="button" class="secondary" id="toggleMemberPost">＋ Create Post</button><button type="button" class="secondary" id="toggleReelsUpload">＋ Reels Upload</button><button type="button" class="danger" id="profileSignOut">↪ Log Out</button></div>
   <div id="followListBox" class="notice hidden"></div>
   <div class="member-discovery"><h3>Find members</h3><div class="tools"><input id="memberSearch" class="search" placeholder="Search username"><button type="button" id="memberSearchBtn">Search</button></div><div id="memberSearchResults" class="member-results"></div></div>
   <div class="field profile-edit-form-item hidden"><label for="profileUsername">Username</label><input id="profileUsername" maxlength="24"></div>
@@ -261,10 +261,8 @@ header.top .brand{flex:1 1 100%!important;min-width:0}
   <div class="tools profile-edit-form-item hidden"><button type="button" class="secondary" id="chooseProfilePhoto">Upload profile photo</button><button type="button" class="secondary" id="chooseProfileCover">Upload cover image</button></div>
   <p class="muted profile-image-hint profile-edit-form-item hidden">Profile photo ya cover badalne ke liye 🖍️ icon dabayein, phir Save my profile karein.</p>
   <button type="button" id="saveMyProfile" class="profile-edit-form-item hidden">Save my profile</button>
-  <div class="profile-account-actions"><button type="button" class="danger" id="profileSignOut">↪ Log Out</button></div>
   <div id="profileStatus" class="notice hidden profile-edit-form-item" role="status"></div>
-  <section class="member-reels-section">
-   <button type="button" id="toggleMemberPost" class="secondary">＋ Create Post</button>
+  <section class="member-posts-section">
    <div id="memberPostForm" class="panel hidden">
     <h3>Upload a Post</h3>
     <div class="field"><label for="memberPostFullName">Full Name</label><input id="memberPostFullName" readonly></div>
@@ -278,7 +276,8 @@ header.top .brand{flex:1 1 100%!important;min-width:0}
     <p id="memberPostStatus" class="muted" role="status"></p>
    </div>
    <div id="memberPostsList"></div>
-   <button type="button" id="toggleReelsUpload" class="secondary">＋ Reels Upload</button>
+  </section>
+  <section class="member-reels-section">
    <div id="memberReelForm" class="panel hidden">
     <h3>Upload Reels</h3>
     <div class="field"><label for="memberReelFullName">Full Name</label><input id="memberReelFullName" readonly></div>
